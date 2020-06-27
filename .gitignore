@@ -1,0 +1,19 @@
+# Vim
+*~
+*.swp
+*.swo
+_vimrc
+
+# Compile binaries and objects
+*.o
+*.elf
+*.bin
+
+# PROS files
+bin/
+*.log
+
+# VS Code and macros
+*.bat
+.vscode/
+compile_commands.json
