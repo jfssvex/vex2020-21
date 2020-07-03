@@ -40,7 +40,7 @@ void initialize() {
 	 		pros::delay(2);
 	 		printf("this is auton id %d, & complete %d\n", getAutonId(), getComplete());
 	 	}
-	 printf("THIS IS AUTON #: %d", getAutonId());
+	printf("THIS IS AUTON #: %d", getAutonId());
 	pros::Task delTask(autonSel);
 	//pros::delay(5000);
 }

@@ -1,5 +1,4 @@
-#ifndef AUTON_SELECTOR
-#define AUTON_SELECTOR
+#pragma once
 
 #include "main.h"
 
@@ -38,5 +37,3 @@ static lv_theme_t * actTheme;
 static lv_obj_t * mbox;
 static lv_style_t mboxStyle;
 static lv_style_t greyPreChosen;
-
-#endif
