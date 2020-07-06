@@ -37,7 +37,7 @@ public:
     void render(void *param);
 
 private:
-    static bool isInitialized;
+    static bool initialized;
     std::vector<lv_obj_t*> logMessages;
     
     // Render calls
