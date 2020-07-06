@@ -9,8 +9,8 @@ enum {
     AUTON_BLUE_UNPROTECTED,
     SIMPLE_ONE_CUBE,
     FLIPOUT
- };
- typedef int auton_options;
+};
+typedef int auton_options;
 
 static void hal_init(void);
 static int tick_thread(void * data);
