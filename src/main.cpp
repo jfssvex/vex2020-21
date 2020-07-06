@@ -1,4 +1,10 @@
+#include "motorTemp.h"
 #include "main.h"
+#include "tracking.h"
+#include "autonSelector.h"
+
+extern bool complete;
+static const int _TESTING = 0;
 
 /**
  * A callback function for LLEMU's center button.
@@ -24,7 +30,20 @@ void on_center_button() {
  */
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
+
+	pros::Task trackingTask(tracking, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Tracking Wheels");
+	pros::Task tempTask(motorTemp, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Temperature tracking");
+
+	pros::delay(500);
+	pros::Task autonSel(autonSelector, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Auton Selector");
+	if (_TESTING == 0)
+		while (getComplete() == 0 && pros::millis() <= 5000)
+		{
+			pros::delay(2);
+			printf("this is auton id %d, & complete %d\n", getAutonId(), getComplete());
+		}
+	printf("THIS IS AUTON #: %d", getAutonId());
+	autonSel.remove();
 
 	pros::lcd::register_btn1_cb(on_center_button);
 }
@@ -58,7 +77,9 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	myAutonomous();
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -74,19 +95,5 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
-
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
-
-		left_mtr = left;
-		right_mtr = right;
-		pros::delay(20);
-	}
+	myOPControl();
 }

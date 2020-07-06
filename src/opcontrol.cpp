@@ -38,37 +38,6 @@ extern float x;
 extern float y;
 extern float theta;
 
-void layStack(Intake intake, Tray& tray, Toggle& t) {
-	tray.layCubes();
-	while(t.checkState() != 0) {
-		tray.update();
-		if(master.getDigital(ControllerDigital::L2)) {
-			tray_motor.move_velocity(70);
-		}
-		else if(master.getDigital(ControllerDigital::R2)) {
-			tray_motor.move_velocity(-70);
-		}
-		else if(tray.getState() != 0x12 && tray.getState() != 0x11) {
-			tray_motor.move_velocity(0);
-		}
-
-		// float traySpeed = joystickSlew(master.getAnalog(ControllerAnalog::rightY));
-		// move({TRAY}, traySpeed*127);
-
-		float driveSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));
-		drive.tank(driveSpeed*0.5f, driveSpeed*0.5f, 0.05f);
-
-		if(driveSpeed < 0) {
-			intake.out(driveSpeed * 127 /2);
-		}
-		else {
-			intake.reset();
-			move({LINTAKE, RINTAKE}, 0);
-		}
-		pros::delay(5);
-	}
-}
-
 std::string IntToStr(double i)
 {
 	std::ostringstream out;
@@ -116,7 +85,7 @@ void processDrive(double straight, double turn) {
 	backLeftDrive.move(leftSpeed * 127);
 }
 
-void opcontrol() {
+void myOPControl() {
 	//lv_theme_t *a = lv_theme_alien_init(10, NULL);
 	//lv_theme_set_current(a);
 	/*lv_obj_t * img = lv_img_create(lv_scr_act(), NULL);

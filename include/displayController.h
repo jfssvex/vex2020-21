@@ -1,6 +1,6 @@
 #pragma once
 
-#include "apix.h"
+#include "pros/apix.h"
 #include <string>
 #include <vector>
 
@@ -14,7 +14,7 @@ enum {
 }; typedef int auton_route;
 
 enum {
-    DEBUG,
+    LOG,
     WARNING,
     ERROR
 }; typedef int logging_level;

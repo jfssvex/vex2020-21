@@ -4,9 +4,10 @@
 const int button_h = 25;
 const int button_w = 40;
 
-lv_color_t red = LV_COLOR_MAKE(234, 35, 58);
-lv_color_t blue = LV_COLOR_MAKE(41, 130, 198);
-lv_color_t purple = LV_COLOR_MAKE(35, 44, 101);
+// C suffix temporary until autonSelector.cpp removed
+lv_color_t redC = LV_COLOR_MAKE(234, 35, 58);
+lv_color_t blueC = LV_COLOR_MAKE(41, 130, 198);
+lv_color_t purpleC = LV_COLOR_MAKE(35, 44, 101);
 
 // Pop-up (message box) style
 lv_style_t mBoxStyle;
@@ -48,7 +49,7 @@ void DisplayController::clearLogs() {
     }
 }
 
-void DisplayController::logMessage(std::string message, logging_level priority = DEBUG) {
+void DisplayController::logMessage(std::string message, logging_level priority) {
     if(priority == ERROR) {
         this->renderError(message);
     }
@@ -68,16 +69,16 @@ DisplayController::DisplayController() {
 
     // Set up styles
     lv_style_copy(&redStyle, &lv_style_plain_color);
-    redStyle.body.main_color = red;
-    redStyle.body.grad_color = red;
+    redStyle.body.main_color = redC;
+    redStyle.body.grad_color = redC;
     redStyle.body.radius = 4;
     redStyle.body.border.width = 0;
-    redStyle.body.border.color = red;
+    redStyle.body.border.color = redC;
     redStyle.body.padding.ver = 5;
     redStyle.body.padding.hor = 5;
     redStyle.body.padding.inner = 0;
     redStyle.body.shadow.width = 0;
-    redStyle.body.shadow.color = red;
+    redStyle.body.shadow.color = redC;
     redStyle.text.color = LV_COLOR_WHITE;
     //	redPreChosen.text.font = &GOTHAM_20;
 
@@ -87,16 +88,16 @@ DisplayController::DisplayController() {
     mBoxStyle.text.color = LV_COLOR_BLACK;
 
     lv_style_copy(&blueStyle, &redStyle);
-    blueStyle.body.main_color = blue;
-    blueStyle.body.grad_color = blue;
+    blueStyle.body.main_color = blueC;
+    blueStyle.body.grad_color = blueC;
 
     lv_style_copy(&neutralStyle, &blueStyle);
-    neutralStyle.body.main_color = purple;
-    neutralStyle.body.grad_color = purple;
+    neutralStyle.body.main_color = purpleC;
+    neutralStyle.body.grad_color = purpleC;
 
     mainTheme = initTheme(LV_COLOR_MAKE(35, 44, 101), LV_COLOR_WHITE);
 
-    colouredBackground = initTheme(purple, LV_COLOR_WHITE);
+    colouredBackground = initTheme(purpleC, LV_COLOR_WHITE);
 }
 
 lv_obj_t* DisplayController::renderLabel(std::string text, int x, int y, lv_obj_t * host) {

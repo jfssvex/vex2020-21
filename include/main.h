@@ -74,6 +74,9 @@ void opcontrol(void);
 void updateSysMan(void *param);
 void nullCallback();
 
+void myAutonomous();
+void myOPControl();
+
 static int autonSet;
 //pros::Vision vision_sensor(VISION_PORT);
 

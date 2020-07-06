@@ -28,10 +28,17 @@ pros::ADIPotentiometer liftPot(LIFT_POT_PORT);
 pros::ADIEncoder backTrackingWheel('A', 'B', true);
 
 using namespace okapi::literals;
-okapi::ChassisControllerIntegrated drive = okapi::ChassisControllerFactory::create(
-    {+FL_PORT, +BL_PORT}, {-FR_PORT, -BR_PORT},
-    okapi::AbstractMotor::gearset::green,
-    {3.25_in, 13_in});
+// okapi::ChassisControllerIntegrated drive = okapi::ChassisControllerFactory::create(
+//     {+FL_PORT, +BL_PORT}, {-FR_PORT, -BR_PORT},
+//     okapi::AbstractMotor::gearset::green,
+//     {3.25_in, 13_in});
+std::shared_ptr<okapi::ChassisController> drive = okapi::ChassisControllerBuilder()
+    .withMotors(
+        {+FL_PORT, +BL_PORT},
+        {FR_PORT, -BR_PORT}
+    )
+    .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 13_in}, okapi::imev5GreenTPR})
+    .build();
 
 void nullCallback() {
     pros::delay(5);

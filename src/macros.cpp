@@ -67,7 +67,7 @@ void finishedTrayCallback() {
     suspendDrive = false;
     stacking = false;
     tray.setCallback(nullCallback);
-    drive.setMaxVelocity(600);
+    drive->setMaxVelocity(600);
     intake.control();
     pros::lcd::print(5, "TRAY CALLBACK: %i", callbackCount);
     callbackCount++;
@@ -104,7 +104,7 @@ void disengageStack() {
     suspendDrive = true;
     stacking = true;
     /*Something with the intake*/
-    drive.setMaxVelocity(30);
+    drive->setMaxVelocity(30);
     using namespace okapi::literals;
     pros::Task trackingTask(outtakeStack, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Let go");
     pros::Task backOffTas(backOff, (void*)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Back off");

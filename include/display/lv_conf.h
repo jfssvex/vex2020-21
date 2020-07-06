@@ -166,6 +166,7 @@
 
 #define USE_PROS_FONT_DEJAVU_MONO_40 0
 #define USE_PROS_FONT_DEJAVU_MONO_40_LATIN_SUP 0
+#define USE_COTHAM_20 1
 
 /*===================
  *  LV_OBJ SETTINGS
