@@ -2,9 +2,7 @@
 #include "main.h"
 #include "tracking.h"
 #include "autonSelector.h"
-
-extern bool complete;
-static const int _TESTING = 0;
+#include "globals.h"
 
 /**
  * A callback function for LLEMU's center button.
@@ -33,17 +31,9 @@ void initialize() {
 
 	pros::Task trackingTask(tracking, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Tracking Wheels");
 	pros::Task tempTask(motorTemp, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Temperature tracking");
-
-	pros::delay(500);
-	pros::Task autonSel(autonSelector, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Auton Selector");
-	if (_TESTING == 0)
-		while (getComplete() == 0 && pros::millis() <= 5000)
-		{
-			pros::delay(2);
-			printf("this is auton id %d, & complete %d\n", getAutonId(), getComplete());
-		}
-	printf("THIS IS AUTON #: %d", getAutonId());
-	autonSel.remove();
+	// Set default auto routine (for testing purposes)
+	setAutonId(FLIPOUT);
+	display.startSelectorMode();
 
 	pros::lcd::register_btn1_cb(on_center_button);
 }
@@ -64,7 +54,13 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+	pros::delay(500);
+	// pros::Task autonSel(autonSelector, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Auton Selector");
+	display.startSelectorMode();
+	printf("THIS IS AUTON #: %d", getAutonId());
+	// autonSel.remove();
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task

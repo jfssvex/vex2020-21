@@ -6,6 +6,7 @@ okapi::Controller master;
 Intake intake(Intake::OPERATOR_OVERRIDE, master);
 Tray tray(Tray::IDLE_STATE, master);
 Lift lift(Lift::IDLE_STATE);
+DisplayController display = DisplayController();
 
 pros::Motor frontLeftDrive(FL_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor backLeftDrive(BL_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);

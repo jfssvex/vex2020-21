@@ -5,12 +5,12 @@
 #include <vector>
 
 enum {
-    AUTON_RED_1,
-    AUTON_RED_2,
-    AUTON_BLUE_1,
-    AUTON_BLUE_2,
-    AUTON_SIMPLE,
-    AUTON_DEPLOY
+    AUTO_RED_1,
+    AUTO_RED_2,
+    AUTO_BLUE_1,
+    AUTO_BLUE_2,
+    AUTO_SIMPLE,
+    AUTO_DEPLOY
 }; typedef int auton_route;
 
 enum {

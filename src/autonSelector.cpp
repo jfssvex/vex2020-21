@@ -62,35 +62,35 @@ void autonSelector(void *param)
 	actTheme = th;
 
 	lv_theme_set_current(actTheme);
-	scr = lv_page_create(NULL, NULL);
-	lv_scr_load(scr);
-	lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
+	scrc = lv_page_create(NULL, NULL);
+	lv_scr_load(scrc);
+	lv_page_set_sb_mode(scrc, LV_SB_MODE_OFF);
 
 	initMainTheme();
 	blueBack->win.bg->body.border.color = purple;
 	blueBack->win.bg->body.main_color = LV_COLOR_WHITE;
 	blueBack->win.bg->body.grad_color = LV_COLOR_WHITE;
 
-	red1 = lv_btn_create(scr, NULL);
+	red1 = lv_btn_create(scrc, NULL);
 	lv_obj_t *label = lv_label_create(red1, NULL);
 	lv_label_set_text(label, "Unprotected Zone \n(5-point)");
 	lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 	lv_btn_set_style(red1, LV_BTN_STYLE_REL, &redPreChosen);
 	lv_cont_set_fit(red1, true, true);
-	lv_obj_align(red1, scr, LV_ALIGN_CENTER, -100, -100);
+	lv_obj_align(red1, scrc, LV_ALIGN_CENTER, -100, -100);
 	lv_btn_set_action(red1, LV_BTN_ACTION_CLICK, changeRed);
 
-	red2 = lv_btn_create(scr, NULL);
+	red2 = lv_btn_create(scrc, NULL);
 	label = lv_label_create(red2, NULL);
 	lv_label_set_text(label, "Protected Zone \n(5-point)");
 	lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 	lv_btn_set_style(red2, LV_BTN_STYLE_REL, &redPreChosen);
 	lv_obj_set_height(red2, lv_obj_get_height(red1));
 	lv_obj_set_width(red2, lv_obj_get_width(red1));
-	lv_obj_align(red2, scr, LV_ALIGN_CENTER, -100, 90);
+	lv_obj_align(red2, scrc, LV_ALIGN_CENTER, -100, 90);
 	lv_btn_set_action(red2, LV_BTN_ACTION_CLICK, changeRed);
 
-	blu1 = lv_btn_create(scr, NULL);
+	blu1 = lv_btn_create(scrc, NULL);
 	lv_btn_set_style(blu1, LV_BTN_STYLE_REL, &bluPreChosen);
 	lv_cont_set_fit(blu1, true, true);
 	lv_obj_align(blu1, red1, LV_ALIGN_CENTER, 200, 0);
@@ -99,7 +99,7 @@ void autonSelector(void *param)
 	lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 	lv_btn_set_action(blu1, LV_BTN_ACTION_CLICK, changeBlue);
 
-	blu2 = lv_btn_create(scr, NULL);
+	blu2 = lv_btn_create(scrc, NULL);
 	lv_btn_set_style(blu2, LV_BTN_STYLE_REL, &bluPreChosen);
 	lv_obj_set_height(blu2, lv_obj_get_height(blu1));
 	lv_obj_set_width(blu2, lv_obj_get_width(blu1));
@@ -109,21 +109,21 @@ void autonSelector(void *param)
 	lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 	lv_btn_set_action(blu2, LV_BTN_ACTION_CLICK, changeBlue);
 
-	pur1 = lv_btn_create(scr, NULL);
+	pur1 = lv_btn_create(scrc, NULL);
 	lv_btn_set_style(pur1, LV_BTN_STYLE_REL, &purPreChosen);
 	lv_obj_set_height(pur1, lv_obj_get_height(blu1));
 	lv_obj_set_width(pur1, lv_obj_get_width(blu1));
-	lv_obj_align(pur1, scr, LV_ALIGN_CENTER, 100, 0);
+	lv_obj_align(pur1, scrc, LV_ALIGN_CENTER, 100, 0);
 	label = lv_label_create(pur1, NULL);
 	lv_label_set_text(label, "Flipout");
 	lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 	lv_btn_set_action(pur1, LV_BTN_ACTION_CLICK, changePurple);
 
-	pur2 = lv_btn_create(scr, NULL);
+	pur2 = lv_btn_create(scrc, NULL);
 	lv_btn_set_style(pur2, LV_BTN_STYLE_REL, &purPreChosen);
 	lv_obj_set_height(pur2, lv_obj_get_height(blu1));
 	lv_obj_set_width(pur2, lv_obj_get_width(blu1));
-	lv_obj_align(pur2, scr, LV_ALIGN_CENTER, -100, 0);
+	lv_obj_align(pur2, scrc, LV_ALIGN_CENTER, -100, 0);
 	label = lv_label_create(pur2, NULL);
 	lv_label_set_text(label, "One Cube");
 	lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
@@ -223,7 +223,7 @@ int confirmChoice(char autonString[])
 	strcpy(s, "S'il vous plait, confirmez-vous que vous voulez choisir <<");
 	strcat(s, autonString);
 	strcat(s, ">> pour l'auton?");
-	mbox = lv_mbox_create(scr, NULL);
+	mbox = lv_mbox_create(scrc, NULL);
 	lv_mbox_set_text(mbox, s);
 	lv_mbox_add_btns(mbox, btns, NULL);
 	lv_mbox_set_action(mbox, click_action);
@@ -285,7 +285,7 @@ void initiate()
 	lv_obj_t *toast;
 	lv_obj_t *royals;
 
-	toast = lv_label_create(scr, NULL);
+	toast = lv_label_create(scrc, NULL);
 	lv_label_set_style(toast, &sicko);
 	lv_label_set_text(toast, "TOAST 2");
 	lv_obj_set_pos(toast, 20, 20);
@@ -298,8 +298,8 @@ auton_options getAutonId()
 
 void deleteScr()
 {
-	lv_obj_clean(scr);
-	//    lv_obj_set_hidden(scr, false);
+	lv_obj_clean(scrc);
+	//    lv_obj_set_hidden(scrc, false);
 	//    lv_obj_t * scr2 = lv_page_create(NULL, NULL);
 	//    lv_scr_load(scr2);
 	//    deleteButtons();

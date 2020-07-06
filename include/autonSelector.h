@@ -32,7 +32,7 @@ auton_options getAutonId();
 
 static lv_theme_t * th;
 static lv_theme_t * blueBack;
-static lv_obj_t * scr;
+static lv_obj_t * scrc;
 static lv_theme_t * actTheme;
 static lv_obj_t * mbox;
 static lv_style_t mboxStyle;

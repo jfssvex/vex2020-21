@@ -1,13 +1,16 @@
 #include "displayController.h"
+#include "autonSelector.h"
 #include <string>
 
-const int button_h = 25;
-const int button_w = 40;
+const int button_h = 60;
+const int button_w = 200;
+
+bool DisplayController::initialized = false;
 
 // C suffix temporary until autonSelector.cpp removed
 lv_color_t redC = LV_COLOR_MAKE(234, 35, 58);
 lv_color_t blueC = LV_COLOR_MAKE(41, 130, 198);
-lv_color_t purpleC = LV_COLOR_MAKE(35, 44, 101);
+lv_color_t purpleC = LV_COLOR_MAKE(104, 11, 128);
 
 // Pop-up (message box) style
 lv_style_t mBoxStyle;
@@ -25,7 +28,7 @@ static lv_obj_t *scr;
 
 static lv_res_t autonSelected(lv_obj_t *btn) {
     int autoID = lv_obj_get_free_num(btn);
-    // Some code to set autonomous to autoID
+    setAutonId(autoID);
 
     return LV_RES_OK;
 }
@@ -115,7 +118,8 @@ lv_obj_t *DisplayController::renderButton(int id, int x, int y, int h, int w, st
 
     lv_obj_set_free_num(button, id);
     lv_btn_set_style(button, LV_BTN_STYLE_REL, relStyle);
-    lv_obj_set_pos(button, x, y);
+    // lv_obj_set_pos(button, x, y);
+    lv_obj_align(button, host, LV_ALIGN_CENTER, x, y);
     lv_obj_set_size(button, w, h);
     lv_btn_set_action(button, LV_BTN_ACTION_CLICK, action);
 
@@ -129,10 +133,68 @@ void DisplayController::startSelectorMode() {
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 
-    renderButton(AUTON_RED_1, -100, -100, button_h, button_w, "Unprotected Zone \n(5-point)", autonSelected, &redStyle, scr);
-    renderButton(AUTON_RED_2, -100, 90, button_h, button_w, "Protected Zone \n(5-point)", autonSelected, &redStyle, scr);
-    renderButton(AUTON_BLUE_1, 100, 0, button_h, button_w, "Unprotected Zone \n(5-point)", autonSelected, &blueStyle, scr);
-    renderButton(AUTON_BLUE_2, 100, 90, button_h, button_w, "Protected Zone \n(5-point)", autonSelected, &blueStyle, scr);
-    renderButton(AUTON_SIMPLE, 100, 0, button_h, button_w, "One ball", autonSelected, &neutralStyle, scr);
-    renderButton(AUTON_DEPLOY, -100, 0, button_h, button_w, "Deploy", autonSelected, &neutralStyle, scr);
+    renderButton(AUTO_RED_1, -150, -100, button_h, button_w, "Unprotected Zone \n(5-point)", autonSelected, &redStyle, scr);
+    renderButton(AUTO_RED_2, -150, 90, button_h, button_w, "Protected Zone \n(5-point)", autonSelected, &redStyle, scr);
+    renderButton(AUTO_BLUE_1, 70, -50, button_h, button_w, "Unprotected Zone\n(5-point)", autonSelected, &blueStyle, scr);
+    renderButton(AUTO_BLUE_2, 70, 80, button_h, button_w, "Protected Zone\n(5-point)", autonSelected, &blueStyle, scr);
+    renderButton(AUTO_DEPLOY, 70, 15, button_h, button_w, "Deploy", autonSelected, &neutralStyle, scr);
+    renderButton(AUTO_SIMPLE, -150, 15, button_h, button_w, "One ball", autonSelected, &neutralStyle, scr);
+
+    // lv_obj_t *red1 = lv_btn_create(scrc, NULL);
+    // lv_obj_t *label = lv_label_create(red1, NULL);
+    // lv_label_set_text(label, "Unprotected Zone \n(5-point)");
+    // lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+    // lv_btn_set_style(red1, LV_BTN_STYLE_REL, &redStyle);
+    // lv_cont_set_fit(red1, true, true);
+    // lv_obj_align(red1, scrc, LV_ALIGN_CENTER, -100, -100);
+    // lv_btn_set_action(red1, LV_BTN_ACTION_CLICK, autonSelected);
+
+    // lv_obj_t *red2 = lv_btn_create(scrc, NULL);
+    // label = lv_label_create(red2, NULL);
+    // lv_label_set_text(label, "Protected Zone \n(5-point)");
+    // lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+    // lv_btn_set_style(red2, LV_BTN_STYLE_REL, &redStyle);
+    // lv_obj_set_height(red2, lv_obj_get_height(red1));
+    // lv_obj_set_width(red2, lv_obj_get_width(red1));
+    // lv_obj_align(red2, scrc, LV_ALIGN_CENTER, -100, 90);
+    // lv_btn_set_action(red2, LV_BTN_ACTION_CLICK, autonSelected);
+
+    // lv_obj_t *blu1 = lv_btn_create(scrc, NULL);
+    // lv_btn_set_style(blu1, LV_BTN_STYLE_REL, &blueStyle);
+    // lv_cont_set_fit(blu1, true, true);
+    // lv_obj_align(blu1, red1, LV_ALIGN_CENTER, 200, 0);
+    // label = lv_label_create(blu1, NULL);
+    // lv_label_set_text(label, "Unprotected Zone \n(5-point)");
+    // lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+    // lv_btn_set_action(blu1, LV_BTN_ACTION_CLICK, autonSelected);
+
+    // lv_obj_t *blu2 = lv_btn_create(scrc, NULL);
+    // lv_btn_set_style(blu2, LV_BTN_STYLE_REL, &blueStyle);
+    // lv_obj_set_height(blu2, lv_obj_get_height(blu1));
+    // lv_obj_set_width(blu2, lv_obj_get_width(blu1));
+    // lv_obj_align(blu2, red2, LV_ALIGN_CENTER, 200, 0);
+    // label = lv_label_create(blu2, NULL);
+    // lv_label_set_text(label, "Protected Zone \n(5-point)");
+    // lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+    // lv_btn_set_action(blu2, LV_BTN_ACTION_CLICK, autonSelected);
+
+    // lv_obj_t *pur1 = lv_btn_create(scrc, NULL);
+    // lv_btn_set_style(pur1, LV_BTN_STYLE_REL, &neutralStyle);
+    // lv_obj_set_height(pur1, lv_obj_get_height(blu1));
+    // lv_obj_set_width(pur1, lv_obj_get_width(blu1));
+    // lv_obj_align(pur1, scrc, LV_ALIGN_CENTER, 100, 0);
+    // label = lv_label_create(pur1, NULL);
+    // lv_label_set_text(label, "Flipout");
+    // lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+    // lv_btn_set_action(pur1, LV_BTN_ACTION_CLICK, autonSelected);
+
+    // lv_obj_t *pur2 = lv_btn_create(scrc, NULL);
+    // lv_btn_set_style(pur2, LV_BTN_STYLE_REL, &neutralStyle);
+    // lv_obj_set_height(pur2, lv_obj_get_height(blu1));
+    // lv_obj_set_width(pur2, lv_obj_get_width(blu1));
+    // lv_obj_align(pur2, scrc, LV_ALIGN_CENTER, -100, 0);
+    // label = lv_label_create(pur2, NULL);
+    // lv_label_set_text(label, "One Cube");
+    // lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+    // lv_btn_set_action(pur2, LV_BTN_ACTION_CLICK, autonSelected);
 }
