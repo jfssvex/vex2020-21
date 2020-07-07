@@ -27,12 +27,10 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-
 	pros::Task trackingTask(tracking, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Tracking Wheels");
 	pros::Task tempTask(motorTemp, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Temperature tracking");
 	// Set default auto routine (for testing purposes)
-	setAutonId(FLIPOUT);
+	setAutonId(UNSELECTED);
 	display.startSelectorMode();
 
 	pros::lcd::register_btn1_cb(on_center_button);

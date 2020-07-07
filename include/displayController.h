@@ -34,6 +34,7 @@ public:
     // Change display mode
     // Enabled when competition switch is connected
     void startSelectorMode();
+    void showAutonSelected();
     void startMatchMode();
 
     // Enabled without competition switch

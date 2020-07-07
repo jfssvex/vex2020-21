@@ -8,7 +8,8 @@ enum {
     AUTON_BLUE_PROTECTED,
     AUTON_BLUE_UNPROTECTED,
     SIMPLE_ONE_CUBE,
-    FLIPOUT
+    FLIPOUT,
+    UNSELECTED
 };
 typedef int auton_options;
 
