@@ -1,5 +1,4 @@
 #include "main.h"
-#include "autonSelector.h"
 #include "globals.h"
 #include "macros.h"
 #include "tracking.h"
@@ -40,7 +39,7 @@ void myAutonomous() {
 	//deleteSelector();
 	tray.fullReset();
 	//setAutonId(AUTON_BLUE_PROTECTED);
-	if(getAutonId() == FLIPOUT) {
+	if(getAuton() == AUTO_DEPLOY) {
 		flipout();
 		drive->setMaxVelocity(75);
 		drive->moveDistance(-0.3_m);
@@ -53,9 +52,9 @@ void myAutonomous() {
 	}
 	update = pros::Task(updateSysMan, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Update system manager");
 	drive->setMaxVelocity(120);
-	if (getAutonId() == FLIPOUT)
+	if (getAuton() == AUTO_DEPLOY)
 		;
-	else if (getAutonId() == AUTON_BLUE_UNPROTECTED) {
+	else if (getAuton() == AUTO_BLUE_1) {
 		flipout();
 		drive->setMaxVelocity(80);
 		drive->moveDistanceAsync(0.80_m);
@@ -86,7 +85,7 @@ void myAutonomous() {
 		drive->setMaxVelocity(70);
 		drive->moveDistance(-0.3_m);
 		intake.reset();
-	} else if(getAutonId() == AUTON_RED_UNPROTECTED) {
+	} else if(getAuton() == AUTO_RED_1) {
 		flipout();
 		drive->setMaxVelocity(80);
 		drive->moveDistanceAsync(0.80_m);
@@ -118,14 +117,14 @@ void myAutonomous() {
 		// drive->moveDistance(-0.3_m);
 		disengageStack();
 		//intake.reset();
-	} else if (getAutonId() == SIMPLE_ONE_CUBE) {
+	} else if (getAuton() == AUTO_SIMPLE) {
 		drive->setMaxVelocity(140);
 		drive->moveDistance(0.08_m);
 		intake.out(-127);
 		drive->moveDistance(-0.12_m);
 		drive->waitUntilSettled();
 		intake.stop();
-	} else if (getAutonId() == AUTON_BLUE_PROTECTED) {
+	} else if (getAuton() == AUTO_RED_2) {
 		drive->setMaxVelocity(130);
 		drive->moveDistance(0.1_m);
 		drive->moveDistance(-0.1_m);
@@ -158,7 +157,7 @@ void myAutonomous() {
 		}
 		pros::lcd::print(1, "Hello again");
 		disengageStack();
-	} else if (getAutonId() == AUTON_RED_PROTECTED) {
+	} else if (getAuton() == AUTO_RED_2) {
 		drive->setMaxVelocity(130);
 		drive->moveDistance(0.3_m);
 		drive->moveDistance(-0.3_m);
@@ -190,32 +189,4 @@ void myAutonomous() {
 	}
 	intake.reset();
 	update.remove();
-	///
-		/*
-	*Possible auton path number 1
-	chassis.moveDistance(2_ft);
-
-	chassis.turnAngle(135_deg);
-
-	chassis.moveDistance(2_ft);
-
-	chassis.turnAngle(-135_deg);
-
-	chassis.moveDistance(2_ft);
-
-	chassis.turnAngle(-135_deg);
-
-	chassis.moveDistance(3_ft);
-	*/
-
-	/*
-	*Possible auton path number 2
-	chassis.moveDistance(2_ft);
-
-	chassis.moveDistance(-2_ft);
-
-	chassis.turnAngle(-90_deg);
-
-	chassis.moveDistance(1_ft);
-	*/
 }

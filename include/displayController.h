@@ -25,6 +25,9 @@ enum {
     DEBUG
 }; typedef int display_mode;
 
+void setAuton(auton_route route);
+auton_route getAuton();
+
 class DisplayController
 {
 public:

@@ -3,7 +3,6 @@
 #include "globals.h"
 #include "systems/toggle.h"
 #include "systems/intake.h"
-#include "autonSelector.h"
 #include "systems/tray.h"
 #include "systems/lift.h"
 #include "globals.h"

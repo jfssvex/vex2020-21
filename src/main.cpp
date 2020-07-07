@@ -1,7 +1,6 @@
 #include "motorTemp.h"
 #include "main.h"
 #include "tracking.h"
-#include "autonSelector.h"
 #include "globals.h"
 
 /**
@@ -27,10 +26,12 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+	// Start tasks
 	pros::Task trackingTask(tracking, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Tracking Wheels");
 	pros::Task tempTask(motorTemp, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Temperature tracking");
+
 	// Set default auto routine (for testing purposes)
-	setAutonId(UNSELECTED);
+	setAuton(AUTO_DEPLOY);
 	display.startSelectorMode();
 
 	pros::lcd::register_btn1_cb(on_center_button);
@@ -54,9 +55,9 @@ void disabled() {}
  */
 void competition_initialize() {
 	pros::delay(500);
-	// pros::Task autonSel(autonSelector, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Auton Selector");
 	display.startSelectorMode();
-	printf("THIS IS AUTON #: %d", getAutonId());
+
+	// pros::Task autonSel(autonSelector, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Auton Selector");
 	// autonSel.remove();
 }
 

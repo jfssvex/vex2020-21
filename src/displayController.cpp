@@ -1,5 +1,4 @@
 #include "displayController.h"
-#include "autonSelector.h"
 #include "globals.h"
 #include <string>
 
@@ -7,6 +6,7 @@ const int button_h = 60;
 const int button_w = 200;
 
 bool DisplayController::initialized = false;
+auton_route selectedRoute = AUTO_DEPLOY;
 
 // C suffix temporary until autonSelector.cpp removed
 lv_color_t redC = LV_COLOR_MAKE(234, 35, 58);
@@ -29,13 +29,21 @@ static lv_obj_t *scr;
 
 static lv_res_t autonSelected(lv_obj_t *btn) {
     int autoID = lv_obj_get_free_num(btn);
-    setAutonId(autoID);
+    setAuton(autoID);
     display.showAutonSelected();
 
     return LV_RES_OK;
 }
 
 static lv_res_t nullButtonCallback(lv_obj_t *btn){ return LV_RES_OK; }
+
+void setAuton(auton_route route) {
+    selectedRoute = route;
+}
+
+auton_route getAuton() {
+    return selectedRoute;
+}
 
 // Might cause errors with pointers !!!!!
 lv_theme_t* DisplayController::initTheme(lv_color_t borderColour, lv_color_t mainColour) {
@@ -129,11 +137,10 @@ lv_obj_t* DisplayController::renderLabel(std::string text, int x, int y, lv_obj_
 }
 
 lv_obj_t *DisplayController::renderButton(int id, int x, int y, int h, int w, std::string labelText, lv_action_t action, lv_style_t *relStyle, lv_obj_t *host) {
+    lv_cont_set_fit(host, false, false);
     lv_obj_t *button = lv_btn_create(host, NULL);
 
     lv_obj_set_pos(button, x, y);
-    // lv_obj_align(button, host, LV_ALIGN_CENTER, x, y);
-    // lv_obj_align(button, scr, LV_ALIGN_IN_TOP_LEFT, x, y);
     lv_obj_set_size(button, w, h);
 
     lv_obj_set_free_num(button, id);
@@ -153,15 +160,12 @@ void DisplayController::startSelectorMode() {
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 
-    // renderButton(AUTO_RED_1, 0, 100, button_h, button_w, "Unprotected Zone \n(5-point)", autonSelected, &redStyle, scr);
-    // renderButton(AUTO_RED_2, LV_HOR_RES / 2, 0, button_h, button_w, "Protected Zone \n(5-point)", autonSelected, &redStyle, scr);
-
-    renderButton(AUTO_RED_2, 0, 0, button_h, button_w, "Unprotected zone \n(5-point)", autonSelected, &redStyle, scr);
+    renderButton(AUTO_RED_1, LV_HOR_RES / 2, 0, button_h, button_w, "Protected zone \n(5-point)", autonSelected, &redStyle, scr);
     renderButton(AUTO_BLUE_1, 0, LV_VER_RES - 80, button_h, button_w, "Unprotected Zone\n(5-point)", autonSelected, &blueStyle, scr);
     renderButton(AUTO_BLUE_2, LV_HOR_RES/2, LV_VER_RES - 80, button_h, button_w, "Protected Zone\n(5-point)", autonSelected, &blueStyle, scr);
     renderButton(AUTO_DEPLOY, 0, LV_VER_RES/2 - 30, button_h, button_w, "Deploy", autonSelected, &neutralStyle, scr);
     renderButton(AUTO_SIMPLE, LV_HOR_RES/2, LV_VER_RES/2 - 30, button_h, button_w, "One ball", autonSelected, &neutralStyle, scr);
-    renderButton(AUTO_RED_1, LV_HOR_RES / 2, 20, button_h, button_w, "Protected Zone \n(5-point)", autonSelected, &redStyle, scr);
+    renderButton(AUTO_RED_2, 0, 20, button_h, button_w, "Unprotected Zone \n(5-point)", autonSelected, &redStyle, scr);
 }
 
 // Only called after autonomous is selected
@@ -173,25 +177,25 @@ void DisplayController::showAutonSelected() {
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 
-    auton_options autoID = getAutonId();
+    auton_route autoID = getAuton();
     std::string autoName;
     switch(autoID) {
-        case (AUTON_RED_PROTECTED):
+        case (AUTO_RED_1):
             autoName = "Red protected routine";
             break;
-        case (AUTON_RED_UNPROTECTED):
+        case (AUTO_RED_2):
             autoName = "Red unprotected routine";
             break;
-        case (AUTON_BLUE_PROTECTED):
+        case (AUTO_BLUE_1):
             autoName = "Blue protected routine";
             break;
-        case (AUTON_BLUE_UNPROTECTED):
+        case (AUTO_BLUE_2):
             autoName = "Blue unprotected routine";
             break;
-        case (SIMPLE_ONE_CUBE):
+        case (AUTO_SIMPLE):
             autoName = "One cube routine";
             break;
-        case (FLIPOUT):
+        case (AUTO_DEPLOY):
             autoName = "Deploy routine";
             break;
         default:
