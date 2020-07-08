@@ -33,6 +33,7 @@ class DisplayController
 public:
     // Constructor
     DisplayController();
+    display_mode getMode();
 
     // Change display mode
     // Enabled when competition switch is connected
@@ -63,5 +64,5 @@ private:
     void renderDebug(std::string message);
 
     // Style initialization
-    lv_theme_t* initTheme(lv_color_t borderColour, lv_color_t mainColour);
+    lv_theme_t *initTheme(int hue, lv_color_t borderColour, lv_color_t mainColour, int borderWidth);
 };

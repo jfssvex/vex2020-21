@@ -85,11 +85,11 @@ void processDrive(double straight, double turn) {
 }
 
 void myOPControl() {
-	//lv_theme_t *a = lv_theme_alien_init(10, NULL);
-	//lv_theme_set_current(a);
-	/*lv_obj_t * img = lv_img_create(lv_scr_act(), NULL);
-	lv_img_set_src(img, &royals);
-	lv_obj_align(img, lv_scr_act(), LV_ALIGN_CENTER, 0, 0);*/
+	if(display.getMode() == SELECTOR)
+		display.startMatchMode();
+	else
+		display.startDebugMode();
+
 	update.remove();
 	intake.control();
 
@@ -107,10 +107,6 @@ void myOPControl() {
 	Toggle controlIntake = Toggle({ControllerDigital::R1}, master, true);
 	Toggle engageTray = Toggle({ControllerDigital::L1}, master);
 	Toggle liftButton = Toggle({ControllerDigital::Y}, master);
-	/*pros::Vision andyVision(VISION_PORT);
-	pros::vision_signature_s_t PURPLE[3];
-	PURPLE[0] = pros::Vision::signature_from_utility(PURPLE_SIG, 2931, 3793, 3362, 5041, 6631, 5836, 4.800, 1);
-	PURPLE[1] = pros::Vision::signature_from_utility(PURPLE_SIG2, 2227, 3669, 2948, 2047, 3799, 2923, 3.6, 0);*/
 	int lastEncoder = getEncoders({TRAY})[0];
 	tray.reset();
 	lift.reset();
@@ -174,26 +170,6 @@ void myOPControl() {
 		dropLift();
 	}
 
-	// TRAY 
-	// if(tray.getState() == Tray::HOLD_STATE) {
-	// 	if(master.getDigital(ControllerDigital::L2) && !stacking) {
-	// 		tray.setOperatorControl(1);
-	// 	}
-	// 	else if(master.getDigital(ControllerDigital::R2) && !stacking) {
-	// 		tray.setOperatorControl(-1);
-	// 	}
-	// 	else if(!stacking) {
-	// 		tray.setOperatorControl(0);
-	// 	}
-	// }
-	// int stack = engageTray.checkState();
-	// if(stack == 1) {
-	// 	stackCubes();
-	// }
-	// if(stack == 0) {
-	// 	disengageStack();
-	// }
-
 	if(master.getDigital(ControllerDigital::L1) && !L1Pressed) {
 		L1Pressed = true;
 		if(trayUp) {
@@ -234,10 +210,6 @@ void myOPControl() {
 	
 	// Diagnostics
 	pros::delay(10);
-	//}
-		//pros::vision_object_s_t testCube = andyVision.get_by_sig(0, PURPLE_SIG2);
-		//pros::lcd::print(5, "location of purple cube: %f", testCube.left_coord);
-		//pros::lcd::print(5, "loc x  %f; loc y %f", x, y);
 	}
 }
 

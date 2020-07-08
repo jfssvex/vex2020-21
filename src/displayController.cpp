@@ -11,7 +11,7 @@ auton_route selectedRoute = AUTO_DEPLOY;
 // C suffix temporary until autonSelector.cpp removed
 lv_color_t redC = LV_COLOR_MAKE(234, 35, 58);
 lv_color_t blueC = LV_COLOR_MAKE(41, 130, 198);
-lv_color_t purpleC = LV_COLOR_MAKE(104, 11, 128);
+lv_color_t purpleC = LV_COLOR_MAKE(88, 36, 133);
 
 // Pop-up (message box) style
 lv_style_t mBoxStyle;
@@ -19,10 +19,13 @@ lv_style_t mBoxStyle;
 lv_style_t redStyle;
 lv_style_t blueStyle;
 lv_style_t neutralStyle;
+// Page style
+lv_style_t pageStyle;
 
 // Page themes
 lv_theme_t *mainTheme;
 lv_theme_t *colouredBackground;
+lv_theme_t *borderless;
 
 // Page object
 static lv_obj_t *scr;
@@ -46,16 +49,20 @@ auton_route getAuton() {
 }
 
 // Might cause errors with pointers !!!!!
-lv_theme_t* DisplayController::initTheme(lv_color_t borderColour, lv_color_t mainColour) {
+lv_theme_t* DisplayController::initTheme(int hue, lv_color_t borderColour, lv_color_t mainColour, int borderWidth) {
     lv_theme_t* theme;
-    theme = lv_theme_alien_init(10, NULL);
+    theme = lv_theme_alien_init(hue, NULL);
     theme->win.bg->body.border.color = LV_COLOR_WHITE;
-    theme->win.bg->body.border.width = 10;
+    theme->win.bg->body.border.width = borderWidth;
     theme->win.bg->body.border.color = borderColour;
     theme->win.bg->body.main_color = mainColour;
     theme->win.bg->body.grad_color = mainColour;
 
     return theme;
+}
+
+display_mode DisplayController::getMode() {
+    return this->mode;
 }
 
 void DisplayController::clearLogs() {
@@ -87,8 +94,8 @@ DisplayController::DisplayController() {
     redStyle.body.main_color = redC;
     redStyle.body.grad_color = redC;
     redStyle.body.radius = 4;
-    redStyle.body.border.width = 0;
-    redStyle.body.border.color = redC;
+    redStyle.body.border.width = 2;
+    redStyle.body.border.color = LV_COLOR_WHITE;
     redStyle.body.padding.ver = 5;
     redStyle.body.padding.hor = 5;
     redStyle.body.padding.inner = 0;
@@ -110,22 +117,7 @@ DisplayController::DisplayController() {
     neutralStyle.body.main_color = purpleC;
     neutralStyle.body.grad_color = purpleC;
 
-    // mainTheme = initTheme(LV_COLOR_MAKE(35, 44, 101), LV_COLOR_WHITE);
-
-    // colouredBackground = initTheme(purpleC, LV_COLOR_WHITE);
-
-    mainTheme = lv_theme_alien_init(50, NULL);
-    mainTheme->win.bg->body.main_color = LV_COLOR_WHITE;
-    mainTheme->win.bg->body.grad_color = LV_COLOR_WHITE;
-    mainTheme->win.bg->body.border.color = LV_COLOR_MAKE(35, 44, 101);
-    mainTheme->win.bg->body.border.width = 10;
-
-    colouredBackground = lv_theme_alien_init(10, NULL);
-    colouredBackground->win.bg->body.border.color = LV_COLOR_WHITE;
-    colouredBackground->win.bg->body.border.width = 10;
-    colouredBackground->win.bg->body.border.color = purpleC;
-    colouredBackground->win.bg->body.main_color = LV_COLOR_WHITE;
-    colouredBackground->win.bg->body.grad_color = LV_COLOR_WHITE;
+    colouredBackground = initTheme(10, purpleC, purpleC, 0);
 }
 
 lv_obj_t* DisplayController::renderLabel(std::string text, int x, int y, lv_obj_t * host) {
@@ -155,7 +147,7 @@ lv_obj_t *DisplayController::renderButton(int id, int x, int y, int h, int w, st
 
 void DisplayController::startSelectorMode() {
     this->mode = SELECTOR;
-    lv_theme_set_current(mainTheme);
+    lv_theme_set_current(colouredBackground);
     scr = lv_page_create(NULL, NULL);
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
@@ -172,7 +164,6 @@ void DisplayController::startSelectorMode() {
 void DisplayController::showAutonSelected() {
     this->mode = SELECTOR;
     lv_obj_clean(scr);
-    lv_theme_set_current(colouredBackground);
     scr = lv_page_create(NULL, NULL);
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
@@ -262,9 +253,14 @@ static lv_fs_res_t pcfs_tell(void *file_p, uint32_t *pos_p)
     return LV_FS_RES_OK;
 }
 
+// Called after auton selector
 void DisplayController::startMatchMode() {
     this->mode = MATCH;
-    
+    lv_obj_clean(scr);
+    scr = lv_page_create(NULL, NULL);
+    lv_scr_load(scr);
+    lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
+
     lv_fs_drv_t pcfs_drv;
     memset(&pcfs_drv, 0, sizeof(lv_fs_drv_t));
 
@@ -280,5 +276,14 @@ void DisplayController::startMatchMode() {
     lv_obj_t *img_var = lv_img_create(lv_scr_act(), NULL);
     lv_img_set_src(img_var, "S:/usd/royals_logo_scaled.bin");
     lv_obj_set_size(img_var, LV_HOR_RES, LV_VER_RES);
-    lv_obj_set_pos(img_var, 0, 0);
+    lv_obj_set_pos(img_var, 0, -10);
+}
+
+// First and only mode to be run
+void DisplayController::startDebugMode() {
+    this->mode = DEBUG;
+    lv_theme_set_current(colouredBackground);
+    scr = lv_page_create(NULL, NULL);
+    lv_scr_load(scr);
+    lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 }
