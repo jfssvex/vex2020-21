@@ -19,12 +19,6 @@ using namespace pros;
 using namespace okapi;
 extern int auton_id;
 
-/*const int { +FL, +BL } = 1;
-const int { -FR, -BR } = 2;
-const auto WHEEL_DIAMETER = 4_in;
-const auto CHASSIS_WIDTH = 11.5_in;
-*/
-
 void updateSysMan(void* param) {
 	while(1) {
 		intake.update();

@@ -32,7 +32,8 @@ void initialize() {
 
 	// Set default auto routine (for testing purposes)
 	setAuton(AUTO_DEPLOY);
-	display.startSelectorMode();
+	// display.startSelectorMode();
+	display.startMatchMode();
 
 	pros::lcd::register_btn1_cb(on_center_button);
 }
