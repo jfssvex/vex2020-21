@@ -4,6 +4,7 @@
 
 const int button_h = 60;
 const int button_w = 200;
+const int maxMessages = 10;
 
 bool DisplayController::initialized = false;
 auton_route selectedRoute = AUTO_DEPLOY;
@@ -12,6 +13,12 @@ auton_route selectedRoute = AUTO_DEPLOY;
 lv_color_t redC = LV_COLOR_MAKE(234, 35, 58);
 lv_color_t blueC = LV_COLOR_MAKE(41, 130, 198);
 lv_color_t purpleC = LV_COLOR_MAKE(88, 36, 133);
+lv_color_t grey = LV_COLOR_MAKE(69, 69, 69);
+lv_color_t yellow = LV_COLOR_MAKE(255, 210, 72);
+
+std::vector<lv_obj_t *> logMessages;
+std::vector<lv_obj_t *> fixedMessages;
+std::vector<fixed_debug_info> fixedMessageData;
 
 // Pop-up (message box) style
 lv_style_t mBoxStyle;
@@ -19,6 +26,8 @@ lv_style_t mBoxStyle;
 lv_style_t redStyle;
 lv_style_t blueStyle;
 lv_style_t neutralStyle;
+lv_style_t logStyle;
+lv_style_t warningStyle;
 // Page style
 lv_style_t pageStyle;
 
@@ -29,6 +38,8 @@ lv_theme_t *borderless;
 
 // Page object
 static lv_obj_t *scr;
+// List object for messages
+lv_obj_t *messsageList;
 
 static lv_res_t autonSelected(lv_obj_t *btn) {
     int autoID = lv_obj_get_free_num(btn);
@@ -48,6 +59,15 @@ auton_route getAuton() {
     return selectedRoute;
 }
 
+void updateFixedMessages(void *param) {
+    while(true) {
+        for(int i = 0; i < fixedMessages.size(); i++) {
+            lv_label_set_text(lv_obj_get_child(fixedMessages[i], NULL), fixedMessageData[i].getLabel().c_str());
+        }
+        pros::delay(20);
+    }
+}
+
 // Might cause errors with pointers !!!!!
 lv_theme_t* DisplayController::initTheme(int hue, lv_color_t borderColour, lv_color_t mainColour, int borderWidth) {
     lv_theme_t* theme;
@@ -65,21 +85,43 @@ display_mode DisplayController::getMode() {
     return this->mode;
 }
 
-void DisplayController::clearLogs() {
-    for(auto i : this->logMessages) {
-        lv_obj_del(i);
+void DisplayController::logMessage(std::string message, logging_level priority) {
+    if(this->mode != DEBUG && priority != ERROR) {
+        return;
     }
+
+    lv_obj_t * newMessage = lv_list_add(messsageList, NULL, message.c_str(), nullButtonCallback);
+
+    lv_style_t messageStyle;
+    switch(priority) {
+        case(LOG):
+            lv_btn_set_style(newMessage, LV_BTN_STYLE_REL, &logStyle);
+            break;
+        case(WARNING):
+            lv_btn_set_style(newMessage, LV_BTN_STYLE_REL, &warningStyle);
+            break;
+        case(ERROR):
+            lv_btn_set_style(newMessage, LV_BTN_STYLE_REL, &redStyle);
+            break;
+        default:
+            lv_btn_set_style(newMessage, LV_BTN_STYLE_REL, &logStyle);
+            break;
+    }
+    logMessages.push_back(newMessage);
+
+    // if(logMessages.size() + fixedMessages.size() > maxMessages) {
+    //     lv_obj_del(logMessages[0]);
+    // }
 }
 
-void DisplayController::logMessage(std::string message, logging_level priority) {
-    if(priority == ERROR) {
-        this->renderError(message);
-    }
-    else if(priority == WARNING) {
-        this->renderWarning(message);
-    }
-    else {
-        this->renderDebug(message);
+void addFixedMessage(std::string format, void *callback, char type) {
+    fixed_debug_info info(format, callback, type);
+    fixedMessageData.push_back(info);
+}
+
+void DisplayController::clearLogs() {
+    for(auto i : logMessages) {
+        lv_obj_del(i);
     }
 }
 
@@ -103,6 +145,15 @@ DisplayController::DisplayController() {
     redStyle.body.shadow.color = redC;
     redStyle.text.color = LV_COLOR_WHITE;
     //	redPreChosen.text.font = &GOTHAM_20;
+
+    lv_style_copy(&logStyle, &redStyle);
+    logStyle.body.main_color = grey;
+    logStyle.body.grad_color = grey;
+
+    lv_style_copy(&warningStyle, &redStyle);
+    warningStyle.body.main_color = yellow;
+    warningStyle.body.grad_color = yellow;
+    warningStyle.text.color = LV_COLOR_BLACK;
 
     lv_style_copy(&mBoxStyle, &redStyle);
     mBoxStyle.body.main_color = LV_COLOR_WHITE;
@@ -277,6 +328,9 @@ void DisplayController::startMatchMode() {
     lv_img_set_src(img_var, "S:/usd/royals_logo_scaled.bin");
     lv_obj_set_size(img_var, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_pos(img_var, 0, -10);
+
+    messsageList = lv_list_create(lv_scr_act(), NULL);
+    lv_obj_set_width(messsageList, LV_HOR_RES - 40);
 }
 
 // First and only mode to be run
@@ -286,4 +340,14 @@ void DisplayController::startDebugMode() {
     scr = lv_page_create(NULL, NULL);
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
+
+    messsageList = lv_list_create(lv_scr_act(), NULL);
+    lv_obj_set_width(messsageList, LV_HOR_RES - 40);
+
+    for(int i = 0; i < fixedMessageData.size(); i++) {
+        fixedMessages.push_back(lv_list_add(messsageList, NULL, fixedMessageData[i].getLabel().c_str(), nullButtonCallback));
+        lv_obj_set_style(fixedMessages[i], &logStyle);
+    }
+
+    pros::Task udpateMessages(updateFixedMessages, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Updating Messages");
 }

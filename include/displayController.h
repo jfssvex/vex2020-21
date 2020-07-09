@@ -3,6 +3,8 @@
 #include "pros/apix.h"
 #include <string>
 #include <vector>
+#include <memory>
+#include <stdexcept>
 
 enum {
     AUTO_RED_1,
@@ -28,6 +30,43 @@ enum {
 void setAuton(auton_route route);
 auton_route getAuton();
 
+template <typename... Args>
+std::string string_format(const std::string &format, Args... args)
+{
+    size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
+    if (size <= 0)
+    {
+        throw std::runtime_error("Error during formatting.");
+    }
+    std::unique_ptr<char[]> buf(new char[size]);
+    snprintf(buf.get(), size, format.c_str(), args...);
+    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
+
+typedef struct fixed_debug_info {
+    std::string format;
+    void * callback;
+    char type;
+    
+    fixed_debug_info(std::string _format, void * _callback, char _type) {
+        this->format = _format;
+        this->callback = _callback;
+        this->type = _type;
+    }
+
+    std::string getLabel() {
+        std::string output;
+        switch(this->type) {
+            case 'i': output = std::to_string(*(int*)callback); break;
+            case 'd': output = std::to_string(*(double*)callback); break;
+            case 'b': output = std::to_string(*(bool*)callback); break;
+            case 's': output = (*(std::string*)callback); break;
+            default: output = std::to_string(*(double*)callback); break;
+        }
+        return this->format + output;
+    }
+} fixed_debug_info;
+
 class DisplayController
 {
 public:
@@ -36,6 +75,7 @@ public:
     display_mode getMode();
 
     // Change display mode
+
     // Enabled when competition switch is connected
     void startSelectorMode();
     void showAutonSelected();
@@ -45,15 +85,12 @@ public:
     void startDebugMode();
 
     // Logging
-    void logMessage(std::string message, logging_level priority = DEBUG);
+    void logMessage(std::string message, logging_level priority = LOG);
     void clearLogs();
-
-    // Render loop initialized as task
-    void render(void *param);
+    void addFixedMessage(std::string format, void * callback, char type);
 
 private:
     static bool initialized;
-    std::vector<lv_obj_t*> logMessages;
     display_mode mode;
     
     // Render calls

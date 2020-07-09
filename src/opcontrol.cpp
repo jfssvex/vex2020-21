@@ -93,6 +93,10 @@ void myOPControl() {
 	update.remove();
 	intake.control();
 
+	display.logMessage("Hey", LOG);
+	display.logMessage("Bruh", WARNING);
+	display.logMessage("Error", ERROR);
+
 	// Acceleration curving
 	double lSpeed =0;
 	double rSpeed = 0;

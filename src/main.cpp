@@ -16,12 +16,11 @@ void initialize() {
 
 	// Set default auto routine (for testing purposes)
 	setAuton(AUTO_DEPLOY);
-	display.startSelectorMode();
-
-	while(getAuton() == AUTO_DEPLOY) {
-		pros::delay(20);
-	}
-	pros::delay(2000);
+	// display.startSelectorMode();
+	// while(getAuton() == AUTO_DEPLOY) {
+	// 	pros::delay(20);
+	// }
+	// pros::delay(2000);
 }
 
 /**
