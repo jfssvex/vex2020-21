@@ -22,6 +22,8 @@ class Intake : public SystemManager {
 		void fullReset() override;
 
 		Intake(uint8_t _defaultState, okapi::Controller _controller);
+		int *getX();
+		int x;
 
 	private:
 

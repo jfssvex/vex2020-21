@@ -1,7 +1,7 @@
 #include "motorTemp.h"
 #include "main.h"
 #include "tracking.h"
-#include "globals.h"
+#include "globals.h" 
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -16,6 +16,7 @@ void initialize() {
 
 	// Set default auto routine (for testing purposes)
 	setAuton(AUTO_DEPLOY);
+	display.addFixedMessage("Bruh: ", 'i', intake.getX());
 	// display.startSelectorMode();
 	// while(getAuton() == AUTO_DEPLOY) {
 	// 	pros::delay(20);

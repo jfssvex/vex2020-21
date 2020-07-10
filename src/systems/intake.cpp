@@ -3,6 +3,10 @@
 
 // Subclass-specific functions
 
+int * Intake::getX() {
+    return &x;
+}
+
 void Intake::setPower(double _power) {
     this->power = _power;
     this->leftIntakeMotor.move(-this->power);

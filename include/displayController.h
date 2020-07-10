@@ -57,11 +57,16 @@ typedef struct fixed_debug_info {
     std::string getLabel() {
         std::string output;
         switch(this->type) {
-            case 'i': output = std::to_string(*(int*)callback); break;
-            case 'd': output = std::to_string(*(double*)callback); break;
-            case 'b': output = std::to_string(*(bool*)callback); break;
-            case 's': output = (*(std::string*)callback); break;
-            default: output = std::to_string(*(double*)callback); break;
+            case 'i':
+                output = std::to_string(*(int*)callback); break;
+            case 'd':
+                output = std::to_string(*(double*)callback); break;
+            case 'b':
+                output = std::to_string(*(bool*)callback); break;
+            case 's':
+                output = (*(std::string*)callback); break;
+            default:
+                output = std::to_string(*(double*)callback); break;
         }
         return this->format + output;
     }
@@ -87,7 +92,7 @@ public:
     // Logging
     void logMessage(std::string message, logging_level priority = LOG);
     void clearLogs();
-    void addFixedMessage(std::string format, void * callback, char type);
+    void addFixedMessage(std::string format, char type, void *callback);
 
 private:
     static bool initialized;

@@ -4,7 +4,7 @@
 
 const int button_h = 60;
 const int button_w = 200;
-const int maxMessages = 10;
+const int maxMessages = 7;
 
 bool DisplayController::initialized = false;
 auton_route selectedRoute = AUTO_DEPLOY;
@@ -109,12 +109,12 @@ void DisplayController::logMessage(std::string message, logging_level priority) 
     }
     logMessages.push_back(newMessage);
 
-    // if(logMessages.size() + fixedMessages.size() > maxMessages) {
-    //     lv_obj_del(logMessages[0]);
-    // }
+    if(logMessages.size() + fixedMessages.size() > maxMessages) {
+        lv_obj_del(logMessages[0]);
+    }
 }
 
-void addFixedMessage(std::string format, void *callback, char type) {
+void DisplayController::addFixedMessage(std::string format, char type, void *callback) {
     fixed_debug_info info(format, callback, type);
     fixedMessageData.push_back(info);
 }
@@ -346,6 +346,7 @@ void DisplayController::startDebugMode() {
 
     for(int i = 0; i < fixedMessageData.size(); i++) {
         fixedMessages.push_back(lv_list_add(messsageList, NULL, fixedMessageData[i].getLabel().c_str(), nullButtonCallback));
+        this->logMessage(std::to_string(lv_obj_count_children(fixedMessages[i])), ERROR);
         lv_obj_set_style(fixedMessages[i], &logStyle);
     }
 
