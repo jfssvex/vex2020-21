@@ -63,11 +63,8 @@ void myOPControl() {
 		display.startDebugMode();
 
 	update.remove();
-	intake.control();
-
-	display.logMessage("Hey", LOG);
-	display.logMessage("Bruh", WARNING);
-	display.logMessage("Error", ERROR);
+	intake.fullReset();
+	rollers.fullReset();
 
 	// Acceleration curving
 	double lSpeed =0;
@@ -93,11 +90,8 @@ void myOPControl() {
 	//flipout();
 
 	while (1) {
-	pros::lcd::print(2, "DRIVE: %f", frontLeftDrive.get_actual_velocity());
-	pros::lcd::print(3, "%d", backTrackingWheel.get_value());
-	tray.update();
 	intake.update();
-	lift.update();
+	rollers.update();
 	encoder = getEncoders({LIFT, TRAY});
 
 	if (abs(getEncoders({TRAY})[0] - lastEncoder) > 5)

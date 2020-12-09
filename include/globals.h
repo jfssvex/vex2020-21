@@ -1,6 +1,7 @@
-#include "../src/systems/intake.h"
-#include "../src/systems/lift.h"
-#include "../src/systems/tray.h"
+#include "systems/intake.h"
+#include "systems/lift.h"
+#include "systems/tray.h"
+#include "systems/rollers.h"
 #include "displayController.h"
 #include "main.h"
 
@@ -9,6 +10,7 @@ extern okapi::Controller master;
 extern Intake intake;
 extern Tray tray;
 extern Lift lift;
+extern Rollers rollers;
 extern DisplayController display;
 
 extern pros::Motor frontLeftDrive;
