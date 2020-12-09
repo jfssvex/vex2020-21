@@ -20,11 +20,17 @@
 #define BOTROLLER 6
 #define TOPROLLER 7
 
+#define TRAY 8
+#define LIFT 9
+
 // Physical motor port connections -- Misc. Motors
 #define LINTAKE_PORT 11
 #define RINTAKE_PORT 12
 #define BOTROLLER_PORT 13
 #define TOPROLLER_PORT 14
+
+#define TRAY_PORT 101
+#define LIFT_PORT 102
 
 #define AUTO_SPEED 80
 #define INTAKE_SPEED 120
