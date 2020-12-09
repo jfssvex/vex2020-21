@@ -13,10 +13,10 @@
 #define BR 1
 
 // Physical motor port connections -- Drive Motors
-#define FL_PORT 20
-#define FR_PORT 11
-#define BL_PORT 19
-#define BR_PORT 12
+#define FL_PORT 6
+#define FR_PORT 8
+#define BL_PORT 5
+#define BR_PORT 7
 
 // allMotors array index --- Misc. Motors
 #define LINTAKE 4
@@ -25,8 +25,8 @@
 #define LIFT 7
 
 // Physical motor port connections -- Misc. Motors
-#define LINTAKE_PORT 5
-#define RINTAKE_PORT 6
+#define LINTAKE_PORT 11
+#define RINTAKE_PORT 12
 #define TRAY_PORT 2
 #define LIFT_PORT 3
 

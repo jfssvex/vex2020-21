@@ -194,8 +194,10 @@ void myOPControl() {
 		tSpeed -= accel * 2;
 	else
 		tSpeed = reqLSpeed;
-	if(!suspendDrive)
-		processDrive(lSpeed, rSpeed, tSpeed);
+	// if(!suspendDrive)
+		// processDrive(lSpeed, rSpeed, tSpeed);
+
+	xDrive->xArcade(reqRSpeed, reqLSpeed, reqTSpeed);
 	
 	// Diagnostics
 	pros::delay(10);
