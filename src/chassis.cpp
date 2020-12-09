@@ -8,8 +8,8 @@ pros::Motor allMotors[] = {
     pros::Motor(BL_PORT, pros::E_MOTOR_GEARSET_18),
     pros::Motor(LINTAKE_PORT),
     pros::Motor(RINTAKE_PORT),
-    pros::Motor(TRAY_PORT),
-    pros::Motor(LIFT_PORT)};
+    pros::Motor(BOTROLLER_PORT),
+    pros::Motor(TOPROLLER_PORT)};
 
 void chassisSet(float leftSpeed, float rightSpeed) {
     allMotors[FR].move(rightSpeed);

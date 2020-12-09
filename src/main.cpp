@@ -9,6 +9,11 @@
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
+
+int * getIntakeX() {
+	return intake.getX();
+}
+
 void initialize() {
 	// Start tasks
 	pros::Task trackingTask(tracking, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Tracking Wheels");
@@ -16,7 +21,7 @@ void initialize() {
 
 	// Set default auto routine (for testing purposes)
 	setAuton(AUTO_DEPLOY);
-	display.addFixedMessage("Bruh: ", 'i', intake.getX());
+	display.addFixedMessage("Bruh: ", 'i', getIntakeX());
 	// display.startSelectorMode();
 	// while(getAuton() == AUTO_DEPLOY) {
 	// 	pros::delay(20);

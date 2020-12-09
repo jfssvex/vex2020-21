@@ -14,7 +14,7 @@ void Intake::setPower(double _power) {
 }
 
 void Intake::intake(double _power) {
-    this->power = _power;
+    this->power = abs(_power);
     this->changeState(IN_STATE);
 }
 

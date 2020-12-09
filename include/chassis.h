@@ -2,10 +2,6 @@
 #include "main.h"
 #include "vector"
 
-// Sensor physical port connections (1-8 for ADI)
-#define TRAY_POT_PORT 1
-#define LIFT_POT_PORT 2
-
 // allMotors array index --- Drive Motors
 #define FL 2
 #define FR 0
@@ -21,14 +17,14 @@
 // allMotors array index --- Misc. Motors
 #define LINTAKE 4
 #define RINTAKE 5
-#define TRAY 6
-#define LIFT 7
+#define BOTROLLER 6
+#define TOPROLLER 7
 
 // Physical motor port connections -- Misc. Motors
 #define LINTAKE_PORT 11
 #define RINTAKE_PORT 12
-#define TRAY_PORT 2
-#define LIFT_PORT 3
+#define BOTROLLER_PORT 13
+#define TOPROLLER_PORT 14
 
 #define AUTO_SPEED 80
 #define INTAKE_SPEED 120
