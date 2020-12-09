@@ -19,6 +19,9 @@ void Intake::intake(double _power) {
 }
 
 void Intake::out(double _power) {
+    if(_power > 0) {
+        _power = -_power;
+    }
     this->power = _power;
     this->changeState(OUT_STATE);
 }

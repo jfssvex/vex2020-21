@@ -44,44 +44,16 @@ std::string IntToStr(double i)
 	return out.str();
 }
 
-void processDrive(double straight, double turn) {
+void processDrive(double straight, double strafe, double turn) {
 	// Absolute dead zones
 	if(abs(straight) <= 0.05)
 		straight = 0;
+	if (abs(strafe) <= 0.05)
+		strafe = 0;
 	if(abs(turn) <= 0.05)
 		turn = 0;
-
-	// Straight and turn dead zones
-	if(straight / turn > DEAD_ZONE_TIGHTNESS)
-		turn = 0;
-	else if(turn / straight > DEAD_ZONE_TIGHTNESS)
-		straight = 0;
-
-	double leftSpeed = 0;
-	double rightSpeed = 0;
-	if(turn == 0) {
-		leftSpeed = straight;
-		rightSpeed = straight;
-	}
-	else if(straight == 0) {
-		rightSpeed = -turn;
-		leftSpeed = turn;
-	}
-	else {
-		double magnitude = sqrt((turn*turn)+(straight*straight));
-		if(straight < 0) {
-			magnitude = -magnitude;
-		} 
-		// double ratio = turn/straight;
-		leftSpeed = magnitude;
-		rightSpeed = magnitude;
-		leftSpeed += turn;
-		rightSpeed -= turn;
-	}
-	frontRightDrive.move(rightSpeed * 127);
-	backRightDrive.move(rightSpeed * 127);
-	frontLeftDrive.move(leftSpeed * 127);
-	backLeftDrive.move(leftSpeed * 127);
+	
+	xDrive->xArcade(strafe, straight, turn);
 }
 
 void myOPControl() {
@@ -100,15 +72,17 @@ void myOPControl() {
 	// Acceleration curving
 	double lSpeed =0;
 	double rSpeed = 0;
+	double tSpeed = 0;
 	double reqRSpeed = 0;
 	double reqLSpeed = 0;
+	double reqTSpeed = 0;
 
 	// Speed limit
 	float speed = 1.0f;
 
 	// Toggle switches
-	Toggle fullIntake = Toggle({ControllerDigital::L2, ControllerDigital::R2}, master);
-	Toggle controlIntake = Toggle({ControllerDigital::R1}, master, true);
+	Toggle fullIntake = Toggle({ControllerDigital::R1}, master);
+	Toggle fullOuttake = Toggle({ControllerDigital::L1}, master);
 	Toggle engageTray = Toggle({ControllerDigital::L1}, master);
 	Toggle liftButton = Toggle({ControllerDigital::Y}, master);
 	int lastEncoder = getEncoders({TRAY})[0];
@@ -138,20 +112,24 @@ void myOPControl() {
 
 	// INTAKE
 	int in = fullIntake.checkState();
-	if(in == 1) {
-		intake.intake(INTAKE_SPEED);
-	}
-	else if(in == 0) {
-		intake.stop();
+	if(in == 1 || in == 0) {
+		if(intake.getState() == Intake::IN_STATE) {
+			intake.stop();
+		}
+		else {
+			intake.intake(INTAKE_SPEED);
+		}
 	}
 
-	// CONTROL INTAKE
-	int control = controlIntake.checkState();
-	if(control == 1) {
-		intake.control();
-	}
-	else if(control == 0) {
-		intake.stop();
+	// OUTTAKE
+	int out = fullOuttake.checkState();
+	if (out == 1 || out == 0) {
+		if (intake.getState() == Intake::OUT_STATE) {
+			intake.stop();
+		}
+		else {
+			intake.out(INTAKE_SPEED);
+		}
 	}
 
 	int liftIterate = 0;
@@ -197,6 +175,7 @@ void myOPControl() {
 	// Acceleration curve
 	reqLSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));
 	reqRSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftX));
+	reqTSpeed = joystickSlew(master.getAnalog(ControllerAnalog::rightX));
 	if (reqRSpeed > (rSpeed+accel))
 		rSpeed+=accel;
 	else if (reqRSpeed < (rSpeed-(accel*2)))
@@ -209,8 +188,14 @@ void myOPControl() {
 		lSpeed -= accel*2;
 	else
 		lSpeed = reqLSpeed;
+	if (reqTSpeed > (tSpeed + accel))
+		tSpeed += accel;
+	else if (reqTSpeed < (tSpeed - (accel * 2)))
+		tSpeed -= accel * 2;
+	else
+		tSpeed = reqLSpeed;
 	if(!suspendDrive)
-		processDrive(lSpeed, rSpeed);
+		processDrive(lSpeed, rSpeed, tSpeed);
 	
 	// Diagnostics
 	pros::delay(10);

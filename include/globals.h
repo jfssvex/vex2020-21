@@ -27,3 +27,4 @@ extern pros::ADIEncoder backTrackingWheel;
 extern pros::Task update;
 
 extern std::shared_ptr<okapi::ChassisController> drive;
+extern std::shared_ptr<okapi::XDriveModel> xDrive;

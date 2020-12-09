@@ -20,7 +20,7 @@ const float bOffset = -3.5;
 #define TRACKING_WHEEL_DEGREE_TO_INCH (M_PI * 3.25 / 360)
 
 void tracking(void* param) {
-	//resetChassis();
+	resetChassis();
 	lLast = 0;
 	rLast = 0;
 	bLast = 0;

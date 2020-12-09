@@ -41,6 +41,13 @@ std::shared_ptr<okapi::ChassisController> drive = okapi::ChassisControllerBuilde
     .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 13_in}, okapi::imev5GreenTPR})
     .build();
 
+std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuilder()
+    .withMotors(FL_PORT, -FR_PORT, -BR_PORT, BL_PORT)
+    .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 17_in}, okapi::imev5GreenTPR})
+    .build();
+
+std::shared_ptr<okapi::XDriveModel> xDrive = std::dynamic_pointer_cast<okapi::XDriveModel>(chassis->getModel());
+
 void nullCallback() {
     pros::delay(5);
 }
