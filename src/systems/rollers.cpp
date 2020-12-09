@@ -3,27 +3,26 @@
 
 // Subclass-specific functions
 
-int * Rollers::getX() {
-    return &x;
-}
-
 void Rollers::setPower(double _power) {
     this->power = _power;
     this->topRollerMotor.move(this->power);
     this->botRollerMotor.move(this->power);
 }
 
-void Rollers::intake(double _power) {
-    this->power = abs(_power);
+void Rollers::intake() {
     this->changeState(IN_STATE);
 }
 
-void Rollers::out(double _power) {
-    if(_power > 0) {
-        _power = -_power;
-    }
-    this->power = _power;
+void Rollers::out() {
     this->changeState(OUT_STATE);
+}
+
+void Rollers::eject() {
+    this->changeState(EJECT_STATE);
+}
+
+void Rollers::shoot() {
+    this->changeState(SHOOT_STATE);
 }
 
 void Rollers::stop() {
@@ -88,10 +87,6 @@ bool Rollers::changeState(uint8_t newState) {
             this->topRollerMotor.move(-DEFAULT_ROLLER_SPEED);
             this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             break;
-        case CYCLE_STATE:
-            this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-            this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
         case SHOOT_STATE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
             this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);

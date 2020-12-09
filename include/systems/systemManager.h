@@ -17,6 +17,7 @@ public:
     void reset();
     bool enabled();
     void disable();
+    void revertState();
     // Enables machine, allowing state to be changed
     void enable();
     

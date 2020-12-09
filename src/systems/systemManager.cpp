@@ -31,6 +31,9 @@ bool SystemManager::enabled() {
 void SystemManager::disable() {
     this->changeState(DISABLED_STATE);
 }
+void SystemManager::revertState() {
+    this->changeState(lastState);
+}
 
 uint8_t SystemManager::getState() {
 	return this->state;

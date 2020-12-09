@@ -14,14 +14,12 @@ public:
     static const uint8_t IN_STATE = 0x11;
     static const uint8_t OUT_STATE = 0x12;
     static const uint8_t EJECT_STATE = 0x13;
-    static const uint8_t CYCLE_STATE = 0x14;
     static const uint8_t SHOOT_STATE = 0x15;
     static const uint8_t HOLD_STATE = 0x16;
 
-    void intake(double _power);
-    void out(double _power);
+    void intake();
+    void out();
     void eject();
-    void cycle();
     void shoot();
     void stop();
 
@@ -29,8 +27,6 @@ public:
     void fullReset() override;
 
     Rollers(uint8_t _defaultState, okapi::Controller _controller);
-    int *getX();
-    int x;
 
 private:
     void setPower(double _power);

@@ -74,9 +74,6 @@ void myOPControl() {
 	double reqLSpeed = 0;
 	double reqTSpeed = 0;
 
-	// Speed limit
-	float speed = 1.0f;
-
 	// Toggle switches
 	Toggle fullIntake = Toggle({ControllerDigital::R1}, master);
 	Toggle fullOuttake = Toggle({ControllerDigital::L1}, master);
@@ -109,9 +106,11 @@ void myOPControl() {
 	if(in == 1 || in == 0) {
 		if(intake.getState() == Intake::IN_STATE) {
 			intake.stop();
+			rollers.stop();
 		}
 		else {
 			intake.intake(INTAKE_SPEED);
+			rollers.intake();
 		}
 	}
 
@@ -120,50 +119,32 @@ void myOPControl() {
 	if (out == 1 || out == 0) {
 		if (intake.getState() == Intake::OUT_STATE) {
 			intake.stop();
+			rollers.stop();
 		}
 		else {
 			intake.out(INTAKE_SPEED);
+			rollers.out();
 		}
 	}
 
-	int liftIterate = 0;
-	if(master.getDigital(ControllerDigital::X)) {
-		//tray.moveTo(100);
-		liftIterate = 1;
+	// EJECTING
+	if(master.getDigital(ControllerDigital::L1)) {
+		rollers.eject();
 	}
-	else if(master.getDigital(ControllerDigital::B)) {
-		liftIterate = -1;
-	}
-	incrementLift(liftIterate);
-
-	if(master.getDigital(ControllerDigital::Y)) {
-		liftToLow();
-	}
-	if(master.getDigital(ControllerDigital::A)) {
-		liftToMid();
-	}
-	if(master.getDigital(ControllerDigital::down)) {
-		dropLift();
+	else if(rollers.getState() == Rollers::EJECT_STATE) {
+		rollers.revertState();
 	}
 
-	if(master.getDigital(ControllerDigital::L1) && !L1Pressed) {
-		L1Pressed = true;
-		if(trayUp) {
-			disengageStack();
-		}
-		else {
-			halfStack();
-		}
+	// SHOOTING
+	if(master.getDigital(ControllerDigital::R2)) {
+		rollers.shoot();
 	}
-	else if(!master.getDigital(ControllerDigital::L1) && L1Pressed && tray.getState() != Tray::LOWER_STATE) {
-		L1Pressed = false;
-		if(trayUp) {
-			stackCubes();
-		}
+	else if (master.getDigital(ControllerDigital::X)) {
+		rollers.shoot();
+		intake.stop();
 	}
-
-	if(master.getDigital(ControllerDigital::L2)) {
-		dropTray();
+	else if (rollers.getState() == Rollers::SHOOT_STATE) {
+		rollers.revertState();
 	}
 
 	// Acceleration curve
@@ -193,7 +174,7 @@ void myOPControl() {
 
 	if(!suspendDrive)
 		xDrive->xArcade(reqRSpeed, reqLSpeed, reqTSpeed);
-	
+
 	// Diagnostics
 	pros::delay(10);
 	}
