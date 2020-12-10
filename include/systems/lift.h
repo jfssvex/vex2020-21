@@ -31,6 +31,6 @@ private:
 
     void(*callback)(){nullCallback};
     bool lockState = false;
-    pros::Motor liftMotor = pros::Motor(LIFT_PORT);
+    pros::Motor liftMotor = pros::Motor(LIFT);
     bool mid = false;
 };

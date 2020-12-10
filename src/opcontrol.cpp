@@ -57,10 +57,10 @@ void processDrive(double straight, double strafe, double turn) {
 }
 
 void myOPControl() {
-	if(display.getMode() == SELECTOR)
-		display.startMatchMode();
-	else
-		display.startDebugMode();
+	// if(display.getMode() == SELECTOR)
+	// 	display.startMatchMode();
+	// else
+	// 	display.startDebugMode();
 
 	update.remove();
 	intake.fullReset();
@@ -77,11 +77,6 @@ void myOPControl() {
 	// Toggle switches
 	Toggle fullIntake = Toggle({ControllerDigital::R1}, master);
 	Toggle fullOuttake = Toggle({ControllerDigital::L1}, master);
-	Toggle engageTray = Toggle({ControllerDigital::L1}, master);
-	Toggle liftButton = Toggle({ControllerDigital::Y}, master);
-	int lastEncoder = getEncoders({TRAY})[0];
-	tray.reset();
-	lift.reset();
 
 	bool L1Pressed = false;
 	//flipout();
@@ -89,13 +84,6 @@ void myOPControl() {
 	while (1) {
 	intake.update();
 	rollers.update();
-	encoder = getEncoders({LIFT, TRAY});
-
-	if (abs(getEncoders({TRAY})[0] - lastEncoder) > 5)
-	{
-		master.setText(0, 0, IntToStr(getEncoders({TRAY})[0]));
-		lastEncoder = getEncoders({TRAY})[0];
-	}
 
 	if(master.getDigital(ControllerDigital::right)) {
 		turnToAngle(90);
@@ -148,9 +136,9 @@ void myOPControl() {
 	}
 
 	// Acceleration curve
-	// reqLSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));
-	// reqRSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftX));
-	// reqTSpeed = joystickSlew(master.getAnalog(ControllerAnalog::rightX));
+	reqLSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));
+	reqRSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftX));
+	reqTSpeed = joystickSlew(master.getAnalog(ControllerAnalog::rightX));
 	// if (reqRSpeed > (rSpeed+accel))
 	// 	rSpeed+=accel;
 	// else if (reqRSpeed < (rSpeed-(accel*2)))
