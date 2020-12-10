@@ -20,3 +20,7 @@ int Toggle::checkState() {
     held = true;
     return state ? 1 : 0;
 }
+
+bool Toggle::getHeld() {
+    return this->held;
+}
