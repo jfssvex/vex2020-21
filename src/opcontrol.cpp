@@ -90,8 +90,9 @@ void myOPControl() {
 	}
 
 	// INTAKE
+	bool inHeld = fullIntake.getHeld();
 	int in = fullIntake.checkState();
-	if(in == 1 || in == 0) {
+	if((in == 1 || in == 0) && inHeld) {
 		if(intake.getState() == Intake::IN_STATE) {
 			intake.stop();
 			rollers.stop();
@@ -103,8 +104,9 @@ void myOPControl() {
 	}
 
 	// OUTTAKE
+	bool outHeld = fullIntake.getHeld();
 	int out = fullOuttake.checkState();
-	if (out == 1 || out == 0) {
+	if((out == 1 || out == 0) && outHeld) {
 		if (intake.getState() == Intake::OUT_STATE) {
 			intake.stop();
 			rollers.stop();
