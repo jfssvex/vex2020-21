@@ -11,7 +11,7 @@ extern Intake intake;
 extern Tray tray;
 extern Lift lift;
 extern Rollers rollers;
-extern DisplayController display;
+// extern DisplayController display;
 
 extern pros::Motor frontLeftDrive;
 extern pros::Motor backLeftDrive;
@@ -25,6 +25,8 @@ extern pros::Motor leftIntake_motor;
 extern pros::ADIPotentiometer trayPot;
 extern pros::ADIPotentiometer liftPot;
 extern pros::ADIEncoder backTrackingWheel;
+extern pros::ADIEncoder rightTrackingWheel;
+extern pros::ADIEncoder leftTrackingWheel;
 
 extern pros::Task update;
 

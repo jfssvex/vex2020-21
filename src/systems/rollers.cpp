@@ -46,9 +46,15 @@ void Rollers::update() {
     switch(this->state) {
         case IDLE_STATE:
             break;
-        case IN_STATE:
-            break;
+        case IN_STATE: {
+            int newPos = this->topRollerMotor.get_position();
+            if(abs(newPos - this->topRollerPos) > 20)
+                this->botRollerMotor.move(0);
+            break; }
         case OUT_STATE:
+            break;
+        case SHOOT_STATE:
+            this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
             break;
         case OPERATOR_OVERRIDE: {
             float newIntakeSpeed = joystickSlew(this->controller.getAnalog(okapi::ControllerAnalog::rightY)) * 127;
@@ -62,6 +68,7 @@ void Rollers::update() {
 }
 
 bool Rollers::changeState(uint8_t newState) {
+    pros::lcd::print(6, "%i", pros::millis());
     bool processed = SystemManager::changeState(newState);
     if(!processed) {
         return false;
@@ -72,15 +79,22 @@ bool Rollers::changeState(uint8_t newState) {
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
             this->setPower(0);
             break;
-        case IN_STATE:
-            this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+        case IN_STATE: {
+            if(this->resetRollerPos)
+                this->topRollerPos = this->topRollerMotor.get_position();
+            this->resetRollerPos = false;
+            this->setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
             this->topRollerMotor.move(0);
             this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            break;
+            int newPos = this->topRollerMotor.get_position();
+            if (abs(newPos - this->topRollerPos) > 20)
+                this->botRollerMotor.move(0);
+
+            break; }
         case OUT_STATE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-            this->topRollerMotor.move(0);
-            this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            this->topRollerMotor.move(-DEFAULT_ROLLER_SPEED);
+            this->botRollerMotor.move(-DEFAULT_ROLLER_SPEED);
             break;
         case EJECT_STATE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
@@ -88,9 +102,11 @@ bool Rollers::changeState(uint8_t newState) {
             this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             break;
         case SHOOT_STATE:
+            this->resetRollerPos = true;
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
             this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            this->botRollerMotor.move(0);
+            this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            break;
         case OPERATOR_OVERRIDE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
             if (this->topRollerMotor.get_actual_velocity() > 20) {

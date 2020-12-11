@@ -19,9 +19,10 @@ void initialize() {
 	pros::Task trackingTask(tracking, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Tracking Wheels");
 	pros::Task tempTask(motorTemp, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Temperature tracking");
 
+	pros::lcd::initialize();
 	// Set default auto routine (for testing purposes)
-	setAuton(AUTO_DEPLOY);
-	display.addFixedMessage("Bruh: ", 'i', getIntakeX());
+	// setAuton(AUTO_DEPLOY);
+	// display.addFixedMessage("Bruh: ", 'i', getIntakeX());
 	// display.startSelectorMode();
 	// while(getAuton() == AUTO_DEPLOY) {
 	// 	pros::delay(20);
@@ -47,7 +48,7 @@ void disabled() {}
  */
 void competition_initialize() {
 	pros::delay(500);
-	display.startSelectorMode();
+	// display.startSelectorMode();
 
 	// pros::Task autonSel(autonSelector, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Auton Selector");
 	// autonSel.remove();

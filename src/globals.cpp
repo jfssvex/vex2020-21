@@ -7,7 +7,7 @@ Intake intake(Intake::OPERATOR_OVERRIDE, master);
 Tray tray(Tray::IDLE_STATE, master);
 Lift lift(Lift::IDLE_STATE);
 Rollers rollers(Rollers::IDLE_STATE, master);
-DisplayController display = DisplayController();
+// DisplayController display = DisplayController();
 
 pros::Motor frontLeftDrive(FL_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor backLeftDrive(BL_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -25,7 +25,9 @@ void nullTask(void *param) {
 }
 pros::Task update(nullTask, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "null");
 
-pros::ADIEncoder backTrackingWheel('A', 'B', true);
+pros::ADIEncoder backTrackingWheel('E', 'F', true);
+pros::ADIEncoder leftTrackingWheel('C', 'D', false);
+pros::ADIEncoder rightTrackingWheel('G', 'H', true);
 
 using namespace okapi::literals;
 // okapi::ChassisControllerIntegrated drive = okapi::ChassisControllerFactory::create(

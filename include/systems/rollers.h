@@ -32,7 +32,9 @@ private:
     void setPower(double _power);
     void setBrakeMode(enum pros::motor_brake_mode_e mode);
     bool changeState(uint8_t newState) override;
-    pros::Motor botRollerMotor = pros::Motor(BOTROLLER_PORT);
+    int topRollerPos = 0;
+    bool resetRollerPos = true;
+    pros::Motor botRollerMotor = pros::Motor(BOTROLLER_PORT, true);
     pros::Motor topRollerMotor = pros::Motor(TOPROLLER_PORT);
     okapi::Controller controller;
 };

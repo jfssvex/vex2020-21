@@ -13,11 +13,11 @@ std::vector<double> encoders;
 float rDist, lDist, aDelta, rLast, lLast, halfA;
 float bDist, bLast;
 //constants
-const float lrOffset = 11.0f/2.0f; //13 inch wheel base, halved
-const float bOffset = -3.5;
+const float lrOffset = 9.5f/2.0f; //9.5 inch wheel base, halved
+const float bOffset = -6.0f;
 
-#define DRIVE_DEGREE_TO_INCH (M_PI * 4 / 360) //inches per tick
-#define TRACKING_WHEEL_DEGREE_TO_INCH (M_PI * 3.25 / 360)
+#define DRIVE_DEGREE_TO_INCH (M_PI * 2.75 / 360) //inches per tick
+#define TRACKING_WHEEL_DEGREE_TO_INCH (M_PI * 2.75 / 360)
 
 void tracking(void* param) {
 	resetChassis();
@@ -36,8 +36,8 @@ void tracking(void* param) {
 		// encoders.push_back((rawEncoders[1] + rawEncoders[0])/2);
 		// encoders.push_back((rawEncoders[2] + rawEncoders[3])/2);
 
-		float leftEncoder = (frontLeftDrive.get_position() + backLeftDrive.get_position())/2;
-		float rightEncoder = (frontRightDrive.get_position() + backRightDrive.get_position())/2;
+		float leftEncoder = leftTrackingWheel.get_value();
+		float rightEncoder = rightTrackingWheel.get_value();
 		lDelta = leftEncoder - lLast;
 		rDelta = rightEncoder - rLast;
 		lLast = leftEncoder;
@@ -83,8 +83,9 @@ void tracking(void* param) {
 		//Update angle
 		//angle += aDelta;
 
-		pros::lcd::print(1, "X: %f, Y: %f, A: %f", x, y, angle/M_PI*180);
-		pros::lcd::print(2, "L: %f R: %f B: %f", left, right, lateral);
+		pros::lcd::print(1, "X: %f, Y: %f", x, y);
+		pros::lcd::print(2, "A: %f", angle/M_PI*180);
+		pros::lcd::print(3, "L: %i R: %i B: %i", (int)leftEncoder, (int)rightEncoder, (int)bLast);
 
 		pros::delay(5);
 	}

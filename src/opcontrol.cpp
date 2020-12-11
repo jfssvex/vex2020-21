@@ -60,7 +60,7 @@ void myOPControl() {
 	// if(display.getMode() == SELECTOR)
 	// 	display.startMatchMode();
 	// else
-	// 	display.startDebugMode();
+	// 	display.startMatchMode();
 
 	update.remove();
 	intake.fullReset();
@@ -76,7 +76,7 @@ void myOPControl() {
 
 	// Toggle switches
 	Toggle fullIntake = Toggle({ControllerDigital::R1}, master);
-	Toggle fullOuttake = Toggle({ControllerDigital::L1}, master);
+	Toggle fullOuttake = Toggle({ControllerDigital::L2}, master);
 
 	bool L1Pressed = false;
 	//flipout();
@@ -90,36 +90,36 @@ void myOPControl() {
 	}
 
 	// INTAKE
-	bool inHeld = fullIntake.getHeld();
-	int in = fullIntake.checkState();
-	if((in == 1 || in == 0) && inHeld) {
-		if(intake.getState() == Intake::IN_STATE) {
-			intake.stop();
-			rollers.stop();
-		}
-		else {
-			intake.intake(INTAKE_SPEED);
+	// OUTTAKE
+	if(master.getDigital(ControllerDigital::R1)) {
+		if (rollers.getState() != Rollers::IN_STATE) {
 			rollers.intake();
+			intake.intake(127);
 		}
+	}
+	else if(rollers.getState() == Rollers::IN_STATE) {
+		rollers.stop();
+		intake.stop();
 	}
 
 	// OUTTAKE
-	bool outHeld = fullIntake.getHeld();
-	int out = fullOuttake.checkState();
-	if((out == 1 || out == 0) && outHeld) {
-		if (intake.getState() == Intake::OUT_STATE) {
-			intake.stop();
-			rollers.stop();
-		}
-		else {
-			intake.out(INTAKE_SPEED);
+	if(master.getDigital(ControllerDigital::L2)) {
+		if (rollers.getState() != Rollers::OUT_STATE) {
 			rollers.out();
+			intake.out(127);
 		}
 	}
+	else if(rollers.getState() == Rollers::OUT_STATE) {
+		rollers.revertState();
+		intake.stop();
+	}
+
+	pros::lcd::print(4, "%i", rollers.getState());
 
 	// EJECTING
 	if(master.getDigital(ControllerDigital::L1)) {
-		rollers.eject();
+		if (rollers.getState() != Rollers::EJECT_STATE)
+			rollers.eject();
 	}
 	else if(rollers.getState() == Rollers::EJECT_STATE) {
 		rollers.revertState();
@@ -127,10 +127,14 @@ void myOPControl() {
 
 	// SHOOTING
 	if(master.getDigital(ControllerDigital::R2)) {
-		rollers.shoot();
+		if(rollers.getState() != Rollers::SHOOT_STATE) {
+			rollers.shoot();
+		}
 	}
 	else if (master.getDigital(ControllerDigital::X)) {
-		rollers.shoot();
+		if (rollers.getState() != Rollers::SHOOT_STATE) {
+			rollers.shoot();
+		}
 		intake.stop();
 	}
 	else if (rollers.getState() == Rollers::SHOOT_STATE) {
