@@ -43,7 +43,7 @@ std::shared_ptr<okapi::ChassisController> drive = okapi::ChassisControllerBuilde
     .build();
 
 std::shared_ptr<okapi::ChassisController> chassis = okapi::ChassisControllerBuilder()
-    .withMotors(FL_PORT, -FR_PORT, -BR_PORT, BL_PORT)
+    .withMotors(FL_PORT, FR_PORT, BR_PORT, BL_PORT)
     .withDimensions(okapi::AbstractMotor::gearset::green, {{4_in, 17_in}, okapi::imev5GreenTPR})
     .build();
 

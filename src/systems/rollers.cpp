@@ -55,6 +55,9 @@ void Rollers::update() {
             break;
         case SHOOT_STATE:
             this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            if(pros::millis() - this->timeOfLastChange > 250) {
+                this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            }
             break;
         case OPERATOR_OVERRIDE: {
             float newIntakeSpeed = joystickSlew(this->controller.getAnalog(okapi::ControllerAnalog::rightY)) * 127;
@@ -105,7 +108,7 @@ bool Rollers::changeState(uint8_t newState) {
             this->resetRollerPos = true;
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
             this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            this->botRollerMotor.move(0);
             break;
         case OPERATOR_OVERRIDE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);

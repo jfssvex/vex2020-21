@@ -85,10 +85,6 @@ void myOPControl() {
 	intake.update();
 	rollers.update();
 
-	if(master.getDigital(ControllerDigital::right)) {
-		turnToAngle(90);
-	}
-
 	// INTAKE
 	// OUTTAKE
 	if(master.getDigital(ControllerDigital::R1)) {

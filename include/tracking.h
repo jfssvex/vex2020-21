@@ -12,6 +12,8 @@
 */
 void tracking(void* param);
 
+void strafeToPoint(int tx, int ty, int tangle);
+
 void turnToAngle(float target);
 
 #endif

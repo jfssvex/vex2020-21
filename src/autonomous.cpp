@@ -29,158 +29,16 @@ void updateSysMan(void* param) {
 }
 
 void myAutonomous() {
-	//autonSelector();
-	//deleteSelector();
-	tray.fullReset();
-	//setAutonId(AUTON_BLUE_PROTECTED);
-	if(getAuton() == AUTO_DEPLOY) {
-		flipout();
-		drive->setMaxVelocity(75);
-		drive->moveDistance(-0.3_m);
-		drive->moveDistance(0.3_m);
-		drive->setMaxVelocity(600);
-		pros::delay(1000);
-	}
-	else {
-		//flipout();
-	}
 	update = pros::Task(updateSysMan, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Update system manager");
 	drive->setMaxVelocity(120);
-	if (getAuton() == AUTO_DEPLOY)
-		;
-	else if (getAuton() == AUTO_BLUE_1) {
-		flipout();
-		drive->setMaxVelocity(80);
-		drive->moveDistanceAsync(0.80_m);
-		intake.intake(100);
-		drive->waitUntilSettled();
-		pros::delay(400);
-		intake.stop();
-		drive->setMaxVelocity(60);
-		drive->turnAngle(-107_deg);
-		drive->setMaxVelocity(120);
-		drive->moveDistance(0.87_m);
-		intake.out(-50);
-		pros::delay(400);
-		intake.reset();
-		stackCubes();
-		while(tray.getTrayState() == tray.LIFT_STATE) {
-			if (pros::millis() <= 14800)
-			{
-				pros::lcd::print(1, "Hello");
-				pros::delay(2);
-			}
-			else
-				break;
-		}
-		intake.stop();
-		pros::delay(500);
-		intake.out(-60);
-		drive->setMaxVelocity(70);
-		drive->moveDistance(-0.3_m);
-		intake.reset();
-	} else if(getAuton() == AUTO_RED_1) {
-		flipout();
-		drive->setMaxVelocity(80);
-		drive->moveDistanceAsync(0.80_m);
-		intake.intake(100);
-		drive->waitUntilSettled();
-		pros::delay(400);
-		intake.stop();
-		drive->setMaxVelocity(60);
-		drive->turnAngle(107_deg);
-		drive->setMaxVelocity(120);
-		drive->moveDistance(0.87_m);
-		intake.out(-50);
-		pros::delay(400);
-		intake.reset();
-		stackCubes();
-		while(tray.getTrayState() == tray.LIFT_STATE) {
-			if (pros::millis() <= 14700)
-			{
-				pros::lcd::print(1, "Hello");
-				pros::delay(2);
-			}
-			else
-				break;
-		}
-		intake.stop();
-		pros::delay(500);
-		// intake.out(-60);
-		// drive->setMaxVelocity(70);
-		// drive->moveDistance(-0.3_m);
-		disengageStack();
-		//intake.reset();
-	} else if (getAuton() == AUTO_SIMPLE) {
-		drive->setMaxVelocity(140);
-		drive->moveDistance(0.08_m);
-		intake.out(-127);
-		drive->moveDistance(-0.12_m);
-		drive->waitUntilSettled();
-		intake.stop();
-	} else if (getAuton() == AUTO_RED_2) {
-		drive->setMaxVelocity(130);
-		drive->moveDistance(0.1_m);
-		drive->moveDistance(-0.1_m);
-		flipout();
-		drive->setMaxVelocity(130);
-		intake.intake(120);
-		drive->moveDistance(0.4_m);
-		pros::delay(200);
-		drive->setMaxVelocity(80);
-		drive->turnAngle(70_deg);
-		drive->setMaxVelocity(130);
-		drive->moveDistance(0.5_m);
-		pros::delay(300);
-		intake.stop();
-		drive->setMaxVelocity(80);
-		drive->turnAngle(25_deg);
-		drive->moveDistance(0.2_m);
-		intake.out(-50);
-		pros::delay(400);
-		intake.reset();
-		stackCubes();
-		while (tray.getTrayState() == 0x11)
-		{
-			if (pros::millis() <= 14500) {
-				pros::lcd::print(1, "Hello");
-				pros::delay(2);
-			} else {
-				drive->moveDistance(-0.3_m);
-			}
-		}
-		pros::lcd::print(1, "Hello again");
-		disengageStack();
-	} else if (getAuton() == AUTO_RED_2) {
-		drive->setMaxVelocity(130);
-		drive->moveDistance(0.3_m);
-		drive->moveDistance(-0.3_m);
-		flipout();
-		drive->setMaxVelocity(80);
-		intake.intake(120);
-		drive->moveDistance(0.4_m);
-		pros::delay(200);
-		drive->setMaxVelocity(60);
-		drive->turnAngle(-90_deg);
-		drive->setMaxVelocity(80);
-		drive->moveDistanceAsync(0.5_m);
-		pros::delay(300);
-		drive->setMaxVelocity(60);
-		drive->turnAngle(90_deg);
-		drive->moveDistance(0.3_m);
-		stackCubes();
-		while (tray.getTrayState() == 0x11)
-		{
-			if (pros::millis() <= 14500) {
-				pros::lcd::print(1, "Hello");
-				pros::delay(2);
-			} else {
-				drive->moveDistance(-0.3_m);
-			}
-		}
-		pros::lcd::print(1, "Hello again");
-		disengageStack();
-	}
+	rollers.fullReset();
+	intake.fullReset();
+
+	//Auto routine
+	rollers.shoot();
+	pros::delay(1500);
+		
+	rollers.reset();
 	intake.reset();
 	update.remove();
 }
