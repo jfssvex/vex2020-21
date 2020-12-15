@@ -3,8 +3,6 @@
 #include "globals.h"
 #include "systems/toggle.h"
 #include "systems/intake.h"
-#include "systems/tray.h"
-#include "systems/lift.h"
 #include "globals.h"
 #include "macros.h"
 #include <initializer_list>
@@ -57,10 +55,10 @@ void processDrive(double straight, double strafe, double turn) {
 }
 
 void myOPControl() {
-	// if(display.getMode() == SELECTOR)
-	// 	display.startMatchMode();
-	// else
-	// 	display.startMatchMode();
+	if(display.getMode() == SELECTOR)
+		display.startMatchMode();
+	else
+		display.startMatchMode();
 
 	update.remove();
 	intake.fullReset();

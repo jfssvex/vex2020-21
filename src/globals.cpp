@@ -4,10 +4,8 @@
 okapi::Controller master;
 
 Intake intake(Intake::OPERATOR_OVERRIDE, master);
-Tray tray(Tray::IDLE_STATE, master);
-Lift lift(Lift::IDLE_STATE);
 Rollers rollers(Rollers::IDLE_STATE, master);
-// DisplayController display = DisplayController();
+DisplayController display = DisplayController();
 
 pros::Motor frontLeftDrive(FL_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor backLeftDrive(BL_PORT, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -30,10 +28,7 @@ pros::ADIEncoder leftTrackingWheel('C', 'D', false);
 pros::ADIEncoder rightTrackingWheel('G', 'H', true);
 
 using namespace okapi::literals;
-// okapi::ChassisControllerIntegrated drive = okapi::ChassisControllerFactory::create(
-//     {+FL_PORT, +BL_PORT}, {-FR_PORT, -BR_PORT},
-//     okapi::AbstractMotor::gearset::green,
-//     {3.25_in, 13_in});
+
 std::shared_ptr<okapi::ChassisController> drive = okapi::ChassisControllerBuilder()
     .withMotors(
         {+FL_PORT, +BL_PORT},

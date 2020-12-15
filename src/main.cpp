@@ -21,13 +21,9 @@ void initialize() {
 
 	pros::lcd::initialize();
 	// Set default auto routine (for testing purposes)
-	// setAuton(AUTO_DEPLOY);
-	// display.addFixedMessage("Bruh: ", 'i', getIntakeX());
-	// display.startSelectorMode();
-	// while(getAuton() == AUTO_DEPLOY) {
-	// 	pros::delay(20);
-	// }
-	// pros::delay(2000);
+	setAuton(AUTO_DEPLOY);
+	display.addFixedMessage("Bruh: ", 'i', getIntakeX());
+	display.startSelectorMode();
 }
 
 /**

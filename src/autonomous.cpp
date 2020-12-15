@@ -22,8 +22,7 @@ extern int auton_id;
 void updateSysMan(void* param) {
 	while(1) {
 		intake.update();
-		tray.update();
-		lift.update();
+		rollers.update();
 		pros::delay(5);
 	}
 }
