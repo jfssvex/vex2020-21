@@ -2,6 +2,7 @@
 #include "systems/rollers.h"
 #include "displayController.h"
 #include "main.h"
+#include "tracking.h"
 
 extern okapi::Controller master;
 
@@ -23,6 +24,8 @@ extern pros::ADIPotentiometer liftPot;
 extern pros::ADIEncoder backTrackingWheel;
 extern pros::ADIEncoder rightTrackingWheel;
 extern pros::ADIEncoder leftTrackingWheel;
+
+extern TrackingData trackingData;
 
 extern pros::Task update;
 

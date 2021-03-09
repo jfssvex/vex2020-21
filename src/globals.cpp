@@ -26,6 +26,7 @@ pros::Task update(nullTask, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DE
 pros::ADIEncoder backTrackingWheel('E', 'F', true);
 pros::ADIEncoder leftTrackingWheel('C', 'D', false);
 pros::ADIEncoder rightTrackingWheel('G', 'H', true);
+TrackingData trackingData(0, 0, 0);
 
 using namespace okapi::literals;
 

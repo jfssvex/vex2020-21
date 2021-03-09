@@ -5,72 +5,84 @@
 #include <math.h>
 #include "okapi/api.hpp"
 
-//Globals
-float x, y, angle;
-//Sensors
+// Sensors
 float rDelta, lDelta, bDelta;
 std::vector<double> encoders;
-//Temp
+// Temp
 float rDist, lDist, aDelta, rLast, lLast, halfA;
 float bDist, bLast;
-//constants
-const float lrOffset = 9.5f/2.0f; //9.5 inch wheel base, halved
-const float bOffset = -6.0f;
+// Constants and macros
+const float lrOffset = WHEELBASE/2.0f; // 9.5 inch wheel base, halved
+const float bOffset = -BACK_WHEEL_OFFSET;
 
-#define DRIVE_DEGREE_TO_INCH (M_PI * 2.75 / 360) //inches per tick
-#define TRACKING_WHEEL_DEGREE_TO_INCH (M_PI * 2.75 / 360)
+// inches per encoder tick (degrees)
+#define DRIVE_DEGREE_TO_INCH (M_PI * DRIVE_WHEEL_DIAMETER / 360) 
+#define TRACKING_WHEEL_DEGREE_TO_INCH (M_PI * TRACKING_WHEEL_DIAMETER / 360)
 
 void tracking(void* param) {
+
+	// Initialize variables
 	resetChassis();
 	lLast = 0;
 	rLast = 0;
 	bLast = 0;
-	x = 0;
-	y = 0;
+	float x = 0;
+	float y = 0;
 	float left = 0;
 	float right = 0;
 	float lateral = 0;
-	angle = 0;
-	while(1) {
-		float localCoord[2];
-		// std::vector<double> rawEncoders = getEncoders({FL, BL, FR, BR});
-		// encoders.push_back((rawEncoders[1] + rawEncoders[0])/2);
-		// encoders.push_back((rawEncoders[2] + rawEncoders[3])/2);
+	float angle = 0;
 
+	// Start tracking loop
+	while(1) {
+		float localX, localY;
+
+		// Get encoder data
 		float leftEncoder = leftTrackingWheel.get_value();
 		float rightEncoder = rightTrackingWheel.get_value();
+		float backEncoder = backTrackingWheel.get_value();
+
+		// Calculate deltas
 		lDelta = leftEncoder - lLast;
 		rDelta = rightEncoder - rLast;
+		bDelta = backEncoder - bLast;
+		lDist = lDelta * TRACKING_WHEEL_DEGREE_TO_INCH;
+		rDist = rDelta * TRACKING_WHEEL_DEGREE_TO_INCH;
+		bDist = bDelta * TRACKING_WHEEL_DEGREE_TO_INCH;
+
+		// Store readings for next deltas
 		lLast = leftEncoder;
 		rLast =	rightEncoder;
-		lDist = lDelta * DRIVE_DEGREE_TO_INCH;
-		rDist = rDelta * DRIVE_DEGREE_TO_INCH;
-		left+=lDist;
-		right+=rDist;
-
-		bDelta = backTrackingWheel.get_value()-bLast;
 		bLast = backTrackingWheel.get_value();
-		bDist = bDelta * TRACKING_WHEEL_DEGREE_TO_INCH;
+
+		// Increment persistent variables
+		left += lDist;
+		right += rDist;
 		lateral += bDist;
 
 		//aDelta = (lDist - rDist)/(lrOffset*2.0f);
+		// Calculate arc angle
 		float holdAngle = angle;
-		angle = ((leftEncoder * DRIVE_DEGREE_TO_INCH) - (rightEncoder * DRIVE_DEGREE_TO_INCH))/(lrOffset * 2.0f);
+		angle = (lDist - rDist)/(lrOffset * 2.0f);
+		// angle = ((leftEncoder * DRIVE_DEGREE_TO_INCH) - (rightEncoder * DRIVE_DEGREE_TO_INCH))/(lrOffset * 2.0f);
 		aDelta = angle - holdAngle;
+
+		// If theres an arc
 		if(aDelta) {
 			float radius = rDist / aDelta;
 			halfA = aDelta/2.0f;
 			float sinHalf = sin(halfA);
-			localCoord[1] = ((radius + lrOffset) * sinHalf) * 2.0f;
+			localY = ((radius + lrOffset) * sinHalf) * 2.0f;
 
 			float backRadius = bDist / aDelta;
-			localCoord[0] = ((backRadius + bOffset) * sinHalf) * 2.0f;
+			localX = ((backRadius + bOffset) * sinHalf) * 2.0f;
 		}
+		// If no arc
 		else {
 			halfA = 0;
 			aDelta = 0;
-			localCoord[1] = (rDist+lDist)/2;
-			localCoord[0] = bDist;
+			localY = (rDist+lDist)/2;
+			localX = bDist;
 		}
 
 		float p = halfA + holdAngle; // The global ending angle of the robot
@@ -78,12 +90,13 @@ void tracking(void* param) {
 		float sinP = sin(p);
 
 		// Update the global position
-		y += localCoord[1] * cosP - localCoord[0] * sinP;
-		x += localCoord[1] * sinP + localCoord[0] * cosP;
+		y += localY * cosP - localX * sinP;
+		x += localY * sinP + localX * cosP;
 
 		//Update angle
 		//angle += aDelta;
 
+		// Print debug
 		pros::lcd::print(1, "X: %f, Y: %f", x, y);
 		pros::lcd::print(2, "A: %f", angle/M_PI*180);
 		pros::lcd::print(3, "L: %i R: %i B: %i", (int)leftEncoder, (int)rightEncoder, (int)bLast);
@@ -92,151 +105,43 @@ void tracking(void* param) {
 	}
 }
 
-#define TOLERANCE 1
+// ----------------- Tracking Data Struct ----------------- //
 
-typedef struct pid_info {
-  double p, i, d, motor;
-
-  pid_info(double _p, double _i, double _d) {
-	  this->p = _p;
-	  this->i = _i;
-	  this->d = _d;
-  }
-} pid_info;
-
-pid_info turnConstants(1, 1, 0);
-
-typedef struct pidData
+TrackingData::TrackingData(double _x, double _y, double _h)
 {
-	float sense;
-	float lastError;
-	float integral;
-	float error, derivative, speed;
-	float target, lastTarget;
-
-	pidData(int _target) {
-		this->target = _target;
-	}
-} pidData;
-
-pidData CalculatePID(pidData data, pid_info pid)
-{
-	//calculate the error from target to current readings
-	data.error = data.target - data.sense;
-	data.integral += data.error; //add the error to the integral
-	//find the derivative by calculating the difference from the previous two
-	//  errors
-	data.derivative = data.error - data.lastError;
-
-	//disable the integral until it comes into a usable range
-	if (data.error == 0 || (abs(data.error) > (127 / 2)))
-	{
-		data.integral = 0;
-	}
-
-	//put the whole PID shenanigan together and calculate the speed
-	data.speed = (pid.p * data.error) + (pid.i * data.integral) + (pid.d * data.derivative);
-
-	//if the previous two errors were 0, then the robot has probably stopped,
-	//  so exit the program
-	if ((abs(data.error) <= 0 && abs(data.lastError) <= 0) || (data.target == data.lastTarget && data.error == data.lastError))
-	{
-		data.speed = 0;
-		data.target = data.sense;
-	}
-
-	return data;
+	this->x = _x;
+	this->y = _y;
+	this->heading = _h;
 }
 
-using namespace okapi;
-const float driveP = 1;
-const float driveI = 0;
-const float driveD = 0;
-
-const float turnP = 1;
-const float turnI = 0;
-const float turnD = 0;
-
-auto dController = IterativeControllerFactory::posPID(driveP, driveI, driveD);
-auto aController = IterativeControllerFactory::posPID(turnP, turnI, turnD);
-
-pros::Motor frontLeft(FL_PORT);
-pros::Motor frontRight(FR_PORT, true);
-pros::Motor backRight(BR_PORT, true);
-pros::Motor backLeft(BL_PORT);
-
-float getDistance(float tx, float ty, float sx, float sy) {
-	float xDiff = tx - sx;
-	float yDiff = ty - sy;
-	return sqrt((xDiff*xDiff) + (yDiff*yDiff));
+double TrackingData::getX() {
+	return x;
+}
+double TrackingData::getY() {
+	return y;
+}
+double TrackingData::getHeading() {
+	return heading;
 }
 
-void strafeToPoint(int tx, int ty, int tangle) {
-	tangle = tangle / 180 * M_PI;
-	dController.reset();
-	aController.reset();
-
-	dController.setTarget(0);
-	aController.setTarget(tangle);
-
-	pros::lcd::print(5, "%i", !(dController.isSettled() && aController.isSettled()));
-
-	int count = 0;
-
-	do
-	{
-		count++;
-		float newX = x;
-		float newY = y;
-		float newAngle = -angle + (M_PI / 2);
-
-		float xVel = dController.step(getDistance(tx, ty, newX, newY));
-		float aVel = aController.step(newAngle);
-
-		float localX = tx * cos(newAngle) - (ty * sin(newAngle));
-		float localY = ty * cos(newAngle) + (tx * sin(newAngle));
-
-		float localAngle = atan2(localX, localY) + (M_PI / 4);
-
-		frontLeft.move((xVel * sin(localAngle) - aVel) * 127);
-		frontRight.move((xVel * cos(localAngle) + aVel) * 127);
-		backLeft.move((xVel * cos(localAngle) - aVel) * 127);
-		backRight.move((xVel * sin(localAngle) + aVel) * 127);
-
-		pros::lcd::print(4, "%i", count);
-		pros::delay(20);
-	}
-	while (!(dController.isSettled() && aController.isSettled()));
+void TrackingData::setX(double _x) {
+	this->x = _x;
+}
+void TrackingData::setY(double _y) {
+	this->y = _y;
+}
+void TrackingData::setHeading(double _h) {
+	this->heading = _h;
 }
 
-void turnToAngle(float target)
-{
-	pidData turnPid(target);
+// ----------------- Vector2 Struct ----------------- //
 
-	int count = 0;
+Vector2 operator + (const Vector2 &v1, const Vector2 &v2) {
+	Vector2 vec(v1.x + v2.x, v1.y + v2.y);
+	return vec;
+}
 
-	do
-	{
-		turnPid.sense = angle * 180 / M_PI;
-		turnPid = CalculatePID(turnPid, turnConstants);
-		float speed = turnPid.speed;
-		if (abs(speed) > 80)
-		{
-			speed = speed < 0 ? -80 : 80;
-		}
-		frontLeft.move(speed);
-		backLeft.move(speed);
-		frontRight.move(-speed);
-		backRight.move(-speed);
-		pros::lcd::print(6, "%f, %f, %f", turnPid.error, target, TOLERANCE);
-		pros::delay(5);
-		if (abs(turnPid.error) <= TOLERANCE)
-		{
-			count++;
-		}
-		else
-		{
-			count = 0;
-		}
-	} while (count < 5);
+Vector2 operator - (const Vector2 &v1, const Vector2 &v2) {
+	Vector2 vec(v1.x - v2.x, v1.y - v2.y);
+	return vec;
 }

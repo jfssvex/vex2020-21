@@ -36,7 +36,7 @@ void myAutonomous() {
 	//Auto routine
 	rollers.shoot();
 	pros::delay(1500);
-		
+
 	rollers.reset();
 	intake.reset();
 	update.remove();
