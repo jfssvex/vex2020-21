@@ -11,13 +11,6 @@ pros::Motor allMotors[] = {
     pros::Motor(BOTROLLER_PORT),
     pros::Motor(TOPROLLER_PORT)};
 
-void chassisSet(float leftSpeed, float rightSpeed) {
-    allMotors[FR].move(rightSpeed);
-    allMotors[BR].move(rightSpeed);
-    allMotors[FL].move(leftSpeed);
-    allMotors[BL].move(leftSpeed);
-}
-
 void hold(int port) {
 	allMotors[port].set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 }
@@ -48,27 +41,12 @@ void moveIntake(int cond) {
 	} else if (cond == 0)
 		move({LINTAKE,RINTAKE}, 0);
 }
+
 void moveAbsolute(std::vector<int> ports, float distance) {
     for(auto i : ports) {
         allMotors[i].move_absolute(distance, 100);
     }
 }
-
-/*void moveIntake() {
-	
-	if (MasterController.ButtonR2.pressing()) {
-			allMotors[M1].move(50);
-			allMotors[M2].move(-50);
-		}
-	else if (MasterController.ButtonR1.pressing()) {
-			allMotors[M1].move(-50);
-			allMotors[M2].move(50);
-		}
-	else {
-			allMotors[M1].move(0);
-			allMotors[M2].move(0);
-		}
-}*/
 
 std::vector<double> getEncoders(std::vector<int> ports) {
     std::vector<double> returnVec;

@@ -93,6 +93,8 @@ void tracking(void* param) {
 		y += localY * cosP - localX * sinP;
 		x += localY * sinP + localX * cosP;
 
+		trackingData.update(x, y, angle);
+
 		//Update angle
 		//angle += aDelta;
 
@@ -105,32 +107,48 @@ void tracking(void* param) {
 	}
 }
 
+// ----------------- Math utilities ----------------- //
+
+Vector2 toLocalCoordinates(Vector2 vec) {
+	double localAngle = trackingData.getHeading();
+	double angle = localAngle - vec.getAngle();
+
+	return rotateVector(vec, angle);
+}
+
+Vector2 rotateVector(Vector2 vec, double angle) {
+	// x = cos(a), y = sin(a)
+	// cos(a + b) = cos(a)cos(b) - sin(a)sin(b)
+	double newX = (vec.getX() * cos(angle)) - (vec.getY() * sin(angle));
+
+	// sin(a + b) = sin(a)cos(b) + cos(a)sin(b)
+	double newY = (vec.getY() * cos(angle)) + (vec.getX() * sin(angle));
+
+	return Vector2(newX, newY);
+}
+
 // ----------------- Tracking Data Struct ----------------- //
 
-TrackingData::TrackingData(double _x, double _y, double _h)
-{
-	this->x = _x;
-	this->y = _y;
-	this->heading = _h;
+TrackingData::TrackingData(double _x, double _y, double _h) {
+	this->pos = Vector2(_x, _y);
+	this->heading = fmod(_h, 360);
 }
 
 double TrackingData::getX() {
-	return x;
+	return pos.getX();
 }
 double TrackingData::getY() {
-	return y;
+	return pos.getY();
 }
 double TrackingData::getHeading() {
 	return heading;
 }
+Vector2 TrackingData::getPos() {
+	return pos;
+}
 
-void TrackingData::setX(double _x) {
-	this->x = _x;
-}
-void TrackingData::setY(double _y) {
-	this->y = _y;
-}
-void TrackingData::setHeading(double _h) {
+void TrackingData::update(double _x, double _y, double _h) {
+	this->pos = Vector2(_x, _y);
 	this->heading = _h;
 }
 
@@ -144,4 +162,38 @@ Vector2 operator + (const Vector2 &v1, const Vector2 &v2) {
 Vector2 operator - (const Vector2 &v1, const Vector2 &v2) {
 	Vector2 vec(v1.x - v2.x, v1.y - v2.y);
 	return vec;
+}
+
+Vector2 operator * (const Vector2 &v1, double scalar) {
+	Vector2 vec(v1.x * scalar, v1.y * scalar);
+	return vec;
+}
+
+Vector2::Vector2(double _x, double _y) {
+	this->x = _x;
+	this->y = _y;
+}
+Vector2::Vector2() {
+	this->x = 0;
+	this->y = 0;
+}
+
+double Vector2::getX() {
+	return x;
+}
+double Vector2::getY() {
+	return y;
+}
+
+double Vector2::getMagnitude() {
+	return sqrt((x*x) + (y*y));
+}
+double Vector2::getAngle() {
+	return atan2(y, x);
+}
+
+void Vector2::normalize() {
+	double divisor = this->getMagnitude();
+	x = x/divisor;
+	y = y/divisor;
 }

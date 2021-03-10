@@ -4,7 +4,8 @@
 #include "main.h"
 #include "chassis.h"
 #include <math.h>
-#define _USE_MATH_DEFINES
+
+#define SETTLE_DELAY 200
 
 typedef struct PIDInfo {
     double p, i, d, motor;
@@ -19,7 +20,9 @@ private:
 	double lastError;
 	double integral;
 	double error, derivative, speed;
-    double target, lastTarget;
+    double target;
+    double settleStart;
+    bool settling, settled = false;
 
     // constants
     double tolerance;
@@ -32,6 +35,7 @@ public:
     void reset();
 
     double getError();
+    bool isSettled();
 
 } PIDController;
 

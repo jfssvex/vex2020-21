@@ -3,7 +3,7 @@
 Code for team 82050A, the Royals, for the Change Up season.
 
 ## Requirements
-- PROS v3.3.1
+- PROS v3.4.0
 - OkapiLib v4.1.0
 
 ## Compilation
