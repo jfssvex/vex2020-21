@@ -87,12 +87,29 @@ void strafe(Vector2 dir, double turn) {
 	backRight.move((xVel + yVel + turn) / scalar * 127);
 }
 
+void strafeToOrientation(Vector2 target, double angle) {
+	PIDController distanceController(target.getMagnitude(), driveConstants, DISTANCE_TOLERANCE);
+	PIDController turnController(angle, turnConstants, TURN_TOLERANCE);
+
+	do {
+		Vector2 delta = target - trackingData.getPos();
+		float strVel = distanceController.step(delta.getMagnitude());
+		Vector2 driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
+		float tVel = turnController.step(trackingData.getHeading());
+
+		strafe(driveVec, tVel);
+
+		pros::delay(20);
+	} while(!distanceController.isSettled() && !turnController.isSettled());
+}
+
 void strafeToPoint(Vector2 target) {
 	PIDController distanceController(target.getMagnitude(), driveConstants, DISTANCE_TOLERANCE);
 
 	do {
-		float vel = distanceController.step((target - trackingData.getPos()).getMagnitude());
-		Vector2 driveVec = rotateVector(Vector2(vel, 0), target.getAngle());
+		Vector2 delta = target - trackingData.getPos();
+		float vel = distanceController.step(delta.getMagnitude());
+		Vector2 driveVec = rotateVector(Vector2(vel, 0), delta.getAngle());
 		strafe(driveVec, 0);
 
 		pros::delay(20);
@@ -135,7 +152,7 @@ double PIDController::step(double newSense) {
         integral = 0;
     }
     speed = (constants.p * error) + (constants.i * integral) + (constants.d * derivative);
-    if(abs(error) <= tolerance && abs(lastError) <= tolerance) {
+    if(abs(error) <= tolerance) {
 		if(!settling) {
 			settleStart = pros::millis();
 		}
@@ -147,6 +164,7 @@ double PIDController::step(double newSense) {
     }
 	else {
 		settling = false;
+		settled = false;
 	}
     return speed;
 }
