@@ -30,7 +30,7 @@ void Rollers::stop() {
 }
 
 void Rollers::setBrakeMode(enum pros::motor_brake_mode_e mode) {
-    this->topRollerMotor.set_brake_mode(mode);
+    this->topRollerMotor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
     this->botRollerMotor.set_brake_mode(mode);
 }
 
@@ -129,8 +129,7 @@ bool Rollers::changeState(uint8_t newState) {
             this->changeState(IDLE_STATE);
             break;
         case DISABLED_STATE:
-            this->topRollerMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-            this->botRollerMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+            this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
             this->setPower(0);
             break;
     }

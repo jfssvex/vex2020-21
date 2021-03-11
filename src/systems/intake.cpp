@@ -80,18 +80,18 @@ bool Intake::changeState(uint8_t newState) {
             this->setPower(0);
             break;
         case IN_STATE:
-            this->leftIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-            this->rightIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+            this->leftIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+            this->rightIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
             this->setPower(power);
             break;
         case OUT_STATE:
-            this->leftIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-            this->rightIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+            this->leftIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+            this->rightIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
             this->setPower(power);
             break;
         case OPERATOR_OVERRIDE:
-            this->leftIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-            this->rightIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+            this->leftIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+            this->rightIntakeMotor.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
             if(this->leftIntakeMotor.get_actual_velocity() > 20) {
                 this->setPower(0);
             }

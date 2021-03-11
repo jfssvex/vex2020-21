@@ -77,7 +77,6 @@ void myOPControl() {
 	Toggle fullOuttake = Toggle({ControllerDigital::L2}, master);
 
 	bool L1Pressed = false;
-	//flipout();
 
 	while (1) {
 	intake.update();
@@ -139,26 +138,6 @@ void myOPControl() {
 	reqLSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));
 	reqRSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftX));
 	reqTSpeed = joystickSlew(master.getAnalog(ControllerAnalog::rightX));
-	// if (reqRSpeed > (rSpeed+accel))
-	// 	rSpeed+=accel;
-	// else if (reqRSpeed < (rSpeed-(accel*2)))
-	// 	rSpeed -= accel*2;
-	// else
-	// 	rSpeed = reqRSpeed;
-	// if (reqLSpeed > (lSpeed+accel))
-	// 	lSpeed+=accel;
-	// else if (reqLSpeed < (lSpeed-(accel*2)))
-	// 	lSpeed -= accel*2;
-	// else
-	// 	lSpeed = reqLSpeed;
-	// if (reqTSpeed > (tSpeed + accel))
-	// 	tSpeed += accel;
-	// else if (reqTSpeed < (tSpeed - (accel * 2)))
-	// 	tSpeed -= accel * 2;
-	// else
-	// 	tSpeed = reqTSpeed;
-	// if(!suspendDrive)
-		// processDrive(lSpeed, rSpeed, tSpeed);
 
 	if(!suspendDrive)
 		xDrive->xArcade(reqRSpeed, reqLSpeed, reqTSpeed);

@@ -39,5 +39,7 @@ public:
 
 } PIDController;
 
-void strafeToPoint(int tx, int ty, int tangle);
+void strafe(Vector2 dir, double turn);
+void strafeToOrientation(Vector2 target, double angle);
+void strafeToPoint(Vector2 target);
 void turnToAngle(float target);
