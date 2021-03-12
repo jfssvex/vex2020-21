@@ -29,7 +29,7 @@ class Intake : public SystemManager {
 
     void setPower(double _power);
     bool changeState(uint8_t newState) override;
-    pros::Motor leftIntakeMotor = pros::Motor(LINTAKE_PORT);
-    pros::Motor rightIntakeMotor = pros::Motor(RINTAKE_PORT);
-    okapi::Controller controller;
+	pros::Motor leftIntakeMotor = pros::Motor(LINTAKE_PORT, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES);
+	pros::Motor rightIntakeMotor = pros::Motor(RINTAKE_PORT, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES);
+	okapi::Controller controller;
 };

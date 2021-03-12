@@ -5,6 +5,7 @@
 #include "systems/intake.h"
 #include "globals.h"
 #include "macros.h"
+#include "control.h"
 #include <initializer_list>
 #include <string>
 #include <sstream>
@@ -55,10 +56,10 @@ void processDrive(double straight, double strafe, double turn) {
 }
 
 void myOPControl() {
-	if(display.getMode() == SELECTOR)
-		display.startMatchMode();
-	else
-		display.startMatchMode();
+	// if(display.getMode() == SELECTOR)
+	// 	display.startMatchMode();
+	// else
+	// 	display.startMatchMode();
 
 	update.remove();
 	intake.fullReset();
@@ -134,12 +135,21 @@ void myOPControl() {
 		rollers.revertState();
 	}
 
+	bool strafing = false;
+	if(master.getDigital(ControllerDigital::up)) {
+		strafe(Vector2(1, 1), 0);
+		strafing = true;
+	}
+	else {
+		strafing = false;
+	}
+
 	// Acceleration curve
 	reqLSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));
 	reqRSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftX));
 	reqTSpeed = joystickSlew(master.getAnalog(ControllerAnalog::rightX));
 
-	if(!suspendDrive)
+	if(!suspendDrive && !strafing)
 		xDrive->xArcade(reqRSpeed, reqLSpeed, reqTSpeed);
 
 	// Diagnostics

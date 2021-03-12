@@ -34,7 +34,7 @@ private:
     bool changeState(uint8_t newState) override;
     int topRollerPos = 0;
     bool resetRollerPos = true;
-    pros::Motor botRollerMotor = pros::Motor(BOTROLLER_PORT, true);
-    pros::Motor topRollerMotor = pros::Motor(TOPROLLER_PORT);
+    pros::Motor botRollerMotor = pros::Motor(BOTROLLER_PORT, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
+    pros::Motor topRollerMotor = pros::Motor(TOPROLLER_PORT, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES);
     okapi::Controller controller;
 };

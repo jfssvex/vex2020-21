@@ -48,14 +48,14 @@ void Rollers::update() {
             break;
         case IN_STATE: {
             int newPos = this->topRollerMotor.get_position();
-            if(abs(newPos - this->topRollerPos) > 20)
+            if(abs(newPos - this->topRollerPos) > 40)
                 this->botRollerMotor.move(0);
             break; }
         case OUT_STATE:
             break;
         case SHOOT_STATE:
             this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            if(pros::millis() - this->timeOfLastChange > 250) {
+            if(pros::millis() - this->timeOfLastChange > 600) {
                 this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             }
             break;
@@ -90,7 +90,7 @@ bool Rollers::changeState(uint8_t newState) {
             this->topRollerMotor.move(0);
             this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             int newPos = this->topRollerMotor.get_position();
-            if (abs(newPos - this->topRollerPos) > 20)
+            if (abs(newPos - this->topRollerPos) > 40)
                 this->botRollerMotor.move(0);
 
             break; }

@@ -63,7 +63,7 @@ void tracking(void* param) {
 		//aDelta = (lDist - rDist)/(lrOffset*2.0f);
 		// Calculate arc angle
 		float holdAngle = angle;
-		angle = (lDist - rDist)/(lrOffset * 2.0f);
+		angle = (left - right)/(lrOffset * 2.0f);
 		// angle = ((leftEncoder * DRIVE_DEGREE_TO_INCH) - (rightEncoder * DRIVE_DEGREE_TO_INCH))/(lrOffset * 2.0f);
 		aDelta = angle - holdAngle;
 
@@ -99,8 +99,8 @@ void tracking(void* param) {
 		//angle += aDelta;
 
 		// Print debug
-		pros::lcd::print(1, "X: %f, Y: %f", x, y);
-		pros::lcd::print(2, "A: %f", angle/M_PI*180);
+		pros::lcd::print(1, "X: %f, Y: %f", trackingData.getX(), trackingData.getY());
+		pros::lcd::print(2, "A: %f", trackingData.getHeading()/M_PI*180);
 		pros::lcd::print(3, "L: %i R: %i B: %i", (int)leftEncoder, (int)rightEncoder, (int)bLast);
 
 		pros::delay(5);

@@ -23,7 +23,7 @@ void initialize() {
 	// Set default auto routine (for testing purposes)
 	setAuton(AUTO_DEPLOY);
 	display.addFixedMessage("Bruh: ", 'i', getIntakeX());
-	display.startSelectorMode();
+	// display.startSelectorMode();
 }
 
 /**
