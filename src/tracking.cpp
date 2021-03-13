@@ -85,13 +85,13 @@ void tracking(void* param) {
 			localX = bDist;
 		}
 
-		float p = -(halfA + holdAngle); // The global ending angle of the robot
+		float p = (halfA + holdAngle); // The global ending angle of the robot
 		float cosP = cos(p);
 		float sinP = sin(p);
 
 		// Update the global position
-		y += localY * cosP - localX * sinP;
-		x += localY * sinP + localX * cosP;
+		y += (localY * cosP) - (localX * sinP);
+		x += (localY * sinP) + (localX * cosP);
 
 		trackingData.update(x, y, angle);
 
