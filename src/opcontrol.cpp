@@ -79,6 +79,8 @@ void myOPControl() {
 
 	bool L1Pressed = false;
 
+	double shotTime = 0;
+
 	while (1) {
 	intake.update();
 	rollers.update();
@@ -108,8 +110,6 @@ void myOPControl() {
 		intake.stop();
 	}
 
-	pros::lcd::print(4, "%i", rollers.getState());
-
 	// EJECTING
 	if(master.getDigital(ControllerDigital::L1)) {
 		if (rollers.getState() != Rollers::EJECT_STATE)
@@ -123,6 +123,10 @@ void myOPControl() {
 	if(master.getDigital(ControllerDigital::R2)) {
 		if(rollers.getState() != Rollers::SHOOT_STATE) {
 			rollers.shoot();
+			shotTime = pros::millis();
+		}
+		if(pros::millis() - shotTime > 150) {
+			intake.intake(127);
 		}
 	}
 	else if (master.getDigital(ControllerDigital::X)) {
@@ -133,15 +137,26 @@ void myOPControl() {
 	}
 	else if (rollers.getState() == Rollers::SHOOT_STATE) {
 		rollers.revertState();
+		intake.stop();
 	}
 
 	bool strafing = false;
 	if(master.getDigital(ControllerDigital::up)) {
-		strafe(Vector2(1, 1), 0);
+		// strafe(Vector2(1, 1), 0);
+		strafeToPoint(Vector2(0, 0));
 		strafing = true;
 	}
 	else {
 		strafing = false;
+	}
+
+	if (master.getDigital(ControllerDigital::right))
+	{
+		// strafe(Vector2(1, 1), 0);
+		turnToAngle(90);
+	}
+	if(master.getDigital(ControllerDigital::down)) {
+		strafeToOrientation(Vector2(0, 0), 0);
 	}
 
 	// Acceleration curve

@@ -54,9 +54,11 @@ void Rollers::update() {
         case OUT_STATE:
             break;
         case SHOOT_STATE:
-            this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            if(pros::millis() - this->timeOfLastChange > 600) {
-                this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            if(pros::millis() - this->timeOfLastChange > 25) {
+                this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
+                if(pros::millis() - this->timeOfLastChange > 250) {
+                    this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
+                }
             }
             break;
         case OPERATOR_OVERRIDE: {
@@ -71,7 +73,6 @@ void Rollers::update() {
 }
 
 bool Rollers::changeState(uint8_t newState) {
-    pros::lcd::print(6, "%i", pros::millis());
     bool processed = SystemManager::changeState(newState);
     if(!processed) {
         return false;
@@ -107,8 +108,8 @@ bool Rollers::changeState(uint8_t newState) {
         case SHOOT_STATE:
             this->resetRollerPos = true;
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-            this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            this->botRollerMotor.move(0);
+            this->topRollerMotor.move(-DEFAULT_ROLLER_SPEED);
+            this->botRollerMotor.move(-DEFAULT_ROLLER_SPEED);
             break;
         case OPERATOR_OVERRIDE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);

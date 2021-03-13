@@ -7,8 +7,8 @@
 // Robot dimensions in inches
 #define DRIVE_WHEEL_DIAMETER 4.0f
 #define TRACKING_WHEEL_DIAMETER 2.75f
-#define WHEELBASE 9.5f
-#define BACK_WHEEL_OFFSET 6.0f
+#define WHEELBASE 10.5f
+#define BACK_WHEEL_OFFSET 5.0f
 
 // allMotors array index --- Drive Motors
 #define FL 2

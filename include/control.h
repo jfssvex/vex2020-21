@@ -29,7 +29,7 @@ private:
     PIDInfo constants;
 
 public:
-	PIDController(int _target, PIDInfo _constants, double _tolerance);
+	PIDController(double _target, PIDInfo _constants, double _tolerance);
 
     double step(double newSense);
     void reset();
@@ -42,4 +42,4 @@ public:
 void strafe(Vector2 dir, double turn);
 void strafeToOrientation(Vector2 target, double angle);
 void strafeToPoint(Vector2 target);
-void turnToAngle(float target);
+void turnToAngle(double target);

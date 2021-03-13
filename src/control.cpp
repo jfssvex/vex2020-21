@@ -6,24 +6,24 @@
 #include <math.h>
 #include "okapi/api.hpp"
 
-#define TURN_TOLERANCE 1
-#define DISTANCE_TOLERANCE 1
+#define TURN_TOLERANCE 3*PI/180
+#define DISTANCE_TOLERANCE 0.5
 
 using namespace okapi;
-const float driveP = 1;
-const float driveI = 0;
-const float driveD = 0;
+const float driveP = 0.2;
+const float driveI = 0.0000000001;
+const float driveD = 0.1;
 
-const float turnP = 1;
-const float turnI = 0;
-const float turnD = 0;
+const float turnP = 1.5;
+const float turnI = 0.1;
+const float turnD = 10;
 
 pros::Motor frontLeft(FL_PORT);
 pros::Motor frontRight(FR_PORT, true);
 pros::Motor backRight(BR_PORT, true);
 pros::Motor backLeft(BL_PORT);
 
-PIDInfo turnConstants(1, 1, 0);
+PIDInfo turnConstants(turnP, turnI, turnD);
 PIDInfo driveConstants(driveP, driveI, driveD);
 
 float getDistance(float tx, float ty, float sx, float sy) {
@@ -72,7 +72,6 @@ float getDistance(float tx, float ty, float sx, float sy) {
 
 void strafe(Vector2 dir, double turn) {
 	dir = toLocalCoordinates(dir);
-	dir.normalize();
 	double xVel = dir.getX();
 	double yVel = dir.getY();
 
@@ -92,7 +91,7 @@ void strafeToOrientation(Vector2 target, double angle) {
 	PIDController turnController(angle, turnConstants, TURN_TOLERANCE);
 
 	do {
-		Vector2 delta = target - trackingData.getPos();
+		Vector2 delta = trackingData.getPos() - target;
 		float strVel = distanceController.step(delta.getMagnitude());
 		Vector2 driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
 		float tVel = turnController.step(trackingData.getHeading());
@@ -104,10 +103,10 @@ void strafeToOrientation(Vector2 target, double angle) {
 }
 
 void strafeToPoint(Vector2 target) {
-	PIDController distanceController(target.getMagnitude(), driveConstants, DISTANCE_TOLERANCE);
+	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE);
 
 	do {
-		Vector2 delta = target - trackingData.getPos();
+		Vector2 delta = trackingData.getPos() - target;
 		float vel = distanceController.step(delta.getMagnitude());
 		Vector2 driveVec = rotateVector(Vector2(vel, 0), delta.getAngle());
 		strafe(driveVec, 0);
@@ -116,7 +115,9 @@ void strafeToPoint(Vector2 target) {
 	} while(!distanceController.isSettled());
 }
 
-void turnToAngle(float target) {
+void turnToAngle(double target) {
+	target = target*PI/180;
+	pros::lcd::print(4, "%f", target);
 	PIDController turnController(target, turnConstants, TURN_TOLERANCE);
 
 	do {
@@ -133,7 +134,7 @@ PIDInfo::PIDInfo(double _p, double _i, double _d) {
     this->d = _d;
 }
 
-PIDController::PIDController(int _target, PIDInfo _constants, double _tolerance) {
+PIDController::PIDController(double _target, PIDInfo _constants, double _tolerance) {
 	this->target = _target;
     this->lastError = target;
     this->constants = _constants;
@@ -141,6 +142,8 @@ PIDController::PIDController(int _target, PIDInfo _constants, double _tolerance)
 }
 
 double PIDController::step(double newSense) {
+
+	pros::lcd::print(3, "%f", target);
     // calculate error terms
     sense = newSense;
     error = target - sense;
@@ -148,7 +151,7 @@ double PIDController::step(double newSense) {
     derivative = error - lastError;
     lastError = error;
     // Disable the integral until it enters a usable range of error
-    if(error == 0 || abs(error) > 127 / 2) {
+    if(error == 0 || abs(error) > 1) {
         integral = 0;
     }
     speed = (constants.p * error) + (constants.i * integral) + (constants.d * derivative);

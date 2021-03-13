@@ -63,13 +63,13 @@ void tracking(void* param) {
 		//aDelta = (lDist - rDist)/(lrOffset*2.0f);
 		// Calculate arc angle
 		float holdAngle = angle;
-		angle = (left - right)/(lrOffset * 2.0f);
+		angle = (right - left)/(lrOffset * 2.0f);
 		// angle = ((leftEncoder * DRIVE_DEGREE_TO_INCH) - (rightEncoder * DRIVE_DEGREE_TO_INCH))/(lrOffset * 2.0f);
 		aDelta = angle - holdAngle;
 
 		// If theres an arc
 		if(aDelta) {
-			float radius = rDist / aDelta;
+			float radius = (rDist / aDelta);
 			halfA = aDelta/2.0f;
 			float sinHalf = sin(halfA);
 			localY = ((radius + lrOffset) * sinHalf) * 2.0f;
@@ -85,7 +85,7 @@ void tracking(void* param) {
 			localX = bDist;
 		}
 
-		float p = halfA + holdAngle; // The global ending angle of the robot
+		float p = -(halfA + holdAngle); // The global ending angle of the robot
 		float cosP = cos(p);
 		float sinP = sin(p);
 
@@ -100,8 +100,7 @@ void tracking(void* param) {
 
 		// Print debug
 		pros::lcd::print(1, "X: %f, Y: %f", trackingData.getX(), trackingData.getY());
-		pros::lcd::print(2, "A: %f", trackingData.getHeading()/M_PI*180);
-		pros::lcd::print(3, "L: %i R: %i B: %i", (int)leftEncoder, (int)rightEncoder, (int)bLast);
+		pros::lcd::print(2, "A: %f", trackingData.getHeading()*180/M_PI);
 
 		pros::delay(5);
 	}
@@ -111,7 +110,7 @@ void tracking(void* param) {
 
 Vector2 toLocalCoordinates(Vector2 vec) {
 	double localAngle = trackingData.getHeading();
-	double angle = localAngle - vec.getAngle();
+	double angle = localAngle;
 
 	return rotateVector(vec, angle);
 }
@@ -131,7 +130,7 @@ Vector2 rotateVector(Vector2 vec, double angle) {
 
 TrackingData::TrackingData(double _x, double _y, double _h) {
 	this->pos = Vector2(_x, _y);
-	this->heading = fmod(_h, 360);
+	this->heading = fmod(_h, 2*M_PI);
 }
 
 double TrackingData::getX() {
