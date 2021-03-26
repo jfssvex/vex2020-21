@@ -22,7 +22,6 @@ const float bOffset = -BACK_WHEEL_OFFSET;
 void tracking(void* param) {
 
 	// Initialize variables
-	resetChassis();
 	lLast = 0;
 	rLast = 0;
 	bLast = 0;
@@ -35,7 +34,7 @@ void tracking(void* param) {
 
 	// Start tracking loop
 	while(1) {
-		float localX, localY;
+		float localX, localY = 0;
 
 		// Get encoder data
 		float leftEncoder = leftTrackingWheel.get_value();
@@ -53,7 +52,7 @@ void tracking(void* param) {
 		// Store readings for next deltas
 		lLast = leftEncoder;
 		rLast =	rightEncoder;
-		bLast = backTrackingWheel.get_value();
+		bLast = backEncoder;
 
 		// Increment persistent variables
 		left += lDist;
@@ -69,13 +68,13 @@ void tracking(void* param) {
 
 		// If theres an arc
 		if(aDelta) {
-			float radius = (rDist / aDelta);
+			float radius = (rDist / aDelta) - lrOffset;
 			halfA = aDelta/2.0f;
 			float sinHalf = sin(halfA);
-			localY = ((radius + lrOffset) * sinHalf) * 2.0f;
+			localY = (radius * sinHalf) * 2.0f;
 
-			float backRadius = bDist / aDelta;
-			localX = ((backRadius + bOffset) * sinHalf) * 2.0f;
+			float backRadius = (bDist / aDelta) - BACK_WHEEL_OFFSET;
+			localX = (backRadius * sinHalf) * 2.0f;
 		}
 		// If no arc
 		else {
@@ -85,7 +84,7 @@ void tracking(void* param) {
 			localX = bDist;
 		}
 
-		float p = (halfA + holdAngle); // The global ending angle of the robot
+		float p = -(halfA + holdAngle); // The global ending angle of the robot
 		float cosP = cos(p);
 		float sinP = sin(p);
 
@@ -94,9 +93,6 @@ void tracking(void* param) {
 		x += (localY * sinP) + (localX * cosP);
 
 		trackingData.update(x, y, angle);
-
-		//Update angle
-		//angle += aDelta;
 
 		// Print debug
 		pros::lcd::print(1, "X: %f, Y: %f", trackingData.getX(), trackingData.getY());
@@ -148,7 +144,7 @@ Vector2 TrackingData::getPos() {
 
 void TrackingData::update(double _x, double _y, double _h) {
 	this->pos = Vector2(_x, _y);
-	this->heading = _h;
+	this->heading = fmod(_h, 2 * M_PI);
 }
 
 // ----------------- Vector2 Struct ----------------- //
