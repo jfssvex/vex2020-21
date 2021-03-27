@@ -48,17 +48,14 @@ void Rollers::update() {
             break;
         case IN_STATE: {
             int newPos = this->topRollerMotor.get_position();
-            if(abs(newPos - this->topRollerPos) > 40)
-                this->botRollerMotor.move(0);
+            // if(abs(newPos - this->topRollerPos) > 40)
+            //     this->botRollerMotor.move(0);
             break; }
         case OUT_STATE:
             break;
         case SHOOT_STATE:
-            if(pros::millis() - this->timeOfLastChange > 25) {
-                this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-                if(pros::millis() - this->timeOfLastChange > 250) {
-                    this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
-                }
+            if(pros::millis() - this->timeOfLastChange > 200) {
+                this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             }
             break;
         case OPERATOR_OVERRIDE: {
@@ -91,8 +88,8 @@ bool Rollers::changeState(uint8_t newState) {
             this->topRollerMotor.move(0);
             this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             int newPos = this->topRollerMotor.get_position();
-            if (abs(newPos - this->topRollerPos) > 40)
-                this->botRollerMotor.move(0);
+            // if (abs(newPos - this->topRollerPos) > 40)
+            //     this->botRollerMotor.move(0);
 
             break; }
         case OUT_STATE:
@@ -102,13 +99,13 @@ bool Rollers::changeState(uint8_t newState) {
             break;
         case EJECT_STATE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-            this->topRollerMotor.move(-DEFAULT_ROLLER_SPEED);
+            this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
             this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             break;
         case SHOOT_STATE:
             this->resetRollerPos = true;
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-            this->topRollerMotor.move(-DEFAULT_ROLLER_SPEED);
+            this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
             this->botRollerMotor.move(-DEFAULT_ROLLER_SPEED);
             break;
         case OPERATOR_OVERRIDE:

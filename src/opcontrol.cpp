@@ -99,7 +99,7 @@ void myOPControl() {
 	}
 
 	// OUTTAKE
-	if(master.getDigital(ControllerDigital::L2)) {
+	if(master.getDigital(ControllerDigital::L1)) {
 		if (rollers.getState() != Rollers::OUT_STATE) {
 			rollers.out();
 			intake.out(127);
@@ -111,7 +111,7 @@ void myOPControl() {
 	}
 
 	// EJECTING
-	if(master.getDigital(ControllerDigital::L1)) {
+	if(master.getDigital(ControllerDigital::L2)) {
 		if (rollers.getState() != Rollers::EJECT_STATE)
 			rollers.eject();
 	}
