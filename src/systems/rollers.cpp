@@ -13,6 +13,10 @@ void Rollers::intake() {
     this->changeState(IN_STATE);
 }
 
+void Rollers::flipout() {
+    this->changeState(FLIPOUT_STATE);
+}
+
 void Rollers::out() {
     this->changeState(OUT_STATE);
 }
@@ -54,8 +58,16 @@ void Rollers::update() {
         case OUT_STATE:
             break;
         case SHOOT_STATE:
-            if(pros::millis() - this->timeOfLastChange > 200) {
+            if(pros::millis() - this->timeOfLastChange > 500) {
                 this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            }
+            else if(pros::millis() - this->timeOfLastChange > 50) {
+                this->botRollerMotor.move(0);
+            }
+            break;
+        case FLIPOUT_STATE:
+            if(pros::millis() - this->timeOfLastChange > 250) {
+                this->stop();
             }
             break;
         case OPERATOR_OVERRIDE: {
@@ -106,8 +118,11 @@ bool Rollers::changeState(uint8_t newState) {
             this->resetRollerPos = true;
             this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
             this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
-            this->botRollerMotor.move(-DEFAULT_ROLLER_SPEED);
+            this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             break;
+        case FLIPOUT_STATE:
+            this->topRollerMotor.move(DEFAULT_ROLLER_SPEED);
+            this->botRollerMotor.move(-DEFAULT_ROLLER_SPEED);
         case OPERATOR_OVERRIDE:
             this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
             if (this->topRollerMotor.get_actual_velocity() > 20) {

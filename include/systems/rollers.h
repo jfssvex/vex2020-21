@@ -16,12 +16,14 @@ public:
     static const uint8_t EJECT_STATE = 0x13;
     static const uint8_t SHOOT_STATE = 0x15;
     static const uint8_t HOLD_STATE = 0x16;
+    static const uint8_t FLIPOUT_STATE = 0x17;
 
     void intake();
     void out();
     void eject();
     void shoot();
     void stop();
+    void flipout();
 
     void update() override;
     void fullReset() override;

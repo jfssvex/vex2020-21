@@ -158,6 +158,9 @@ void myOPControl() {
 	if(master.getDigital(ControllerDigital::down)) {
 		strafeToOrientation(Vector2(0, 0), 0);
 	}
+	if(master.getDigital(ControllerDigital::left)) {
+		rollers.flipout();
+	}
 
 	// Acceleration curve
 	reqLSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));

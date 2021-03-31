@@ -6,8 +6,8 @@
 #include <math.h>
 #include "okapi/api.hpp"
 
-#define TURN_TOLERANCE 3*PI/180
-#define DISTANCE_TOLERANCE 0.5
+#define TURN_TOLERANCE 0.04
+#define DISTANCE_TOLERANCE 0.7
 
 using namespace okapi;
 const float driveP = 0.2;
@@ -16,7 +16,7 @@ const float driveD = 0.1;
 
 const float turnP = 1.5;
 const float turnI = 0.1;
-const float turnD = 10;
+const float turnD = 0.5;
 
 pros::Motor frontLeft(FL_PORT);
 pros::Motor frontRight(FR_PORT, true);
@@ -87,29 +87,42 @@ void strafe(Vector2 dir, double turn) {
 }
 
 void strafeToOrientation(Vector2 target, double angle) {
-	PIDController distanceController(target.getMagnitude(), driveConstants, DISTANCE_TOLERANCE);
+	double time = pros::millis();
+	angle = angle*PI/180;
+	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE);
 	PIDController turnController(angle, turnConstants, TURN_TOLERANCE);
 
 	do {
 		Vector2 delta = trackingData.getPos() - target;
 		float strVel = distanceController.step(delta.getMagnitude());
 		Vector2 driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
-		float tVel = turnController.step(trackingData.getHeading());
+		float tVel = 2 * turnController.step(trackingData.getHeading());
 
 		strafe(driveVec, tVel);
 
+		if(pros::millis() - time > 4000) {
+			break;
+		}
+
 		pros::delay(20);
-	} while(!distanceController.isSettled() && !turnController.isSettled());
+	} while(!distanceController.isSettled() || !turnController.isSettled());
 }
 
 void strafeToPoint(Vector2 target) {
+	double time = pros::millis();
 	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE);
 
 	do {
 		Vector2 delta = trackingData.getPos() - target;
 		float vel = distanceController.step(delta.getMagnitude());
 		Vector2 driveVec = rotateVector(Vector2(vel, 0), delta.getAngle());
+		printf("X: %f, Y: %f", driveVec.getX(), driveVec.getY());
+		pros::lcd::print(4, "X: %f, Y: %f", driveVec.getX(), driveVec.getY());
 		strafe(driveVec, 0);
+
+		if(pros::millis() - time > 4000) {
+			break;
+		}
 
 		pros::delay(20);
 	} while(!distanceController.isSettled());
@@ -117,12 +130,16 @@ void strafeToPoint(Vector2 target) {
 
 void turnToAngle(double target) {
 	target = target*PI/180;
-	pros::lcd::print(4, "%f", target);
+	double time = pros::millis();
 	PIDController turnController(target, turnConstants, TURN_TOLERANCE);
 
 	do {
 		float vel = turnController.step(trackingData.getHeading());
 		strafe(Vector2(0, 0), vel);
+
+		if(pros::millis() - time > 4000) {
+			break;
+		}
 
 		pros::delay(20);
 	} while(!turnController.isSettled());
@@ -143,7 +160,6 @@ PIDController::PIDController(double _target, PIDInfo _constants, double _toleran
 
 double PIDController::step(double newSense) {
 
-	pros::lcd::print(3, "%f", target);
     // calculate error terms
     sense = newSense;
     error = target - sense;

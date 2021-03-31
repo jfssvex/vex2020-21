@@ -165,9 +165,28 @@ int callbackCount = 0;
 
 void flipout()
 {
-    strafe(Vector2(0, 1), 0);
-    pros::delay(300);
-    strafe(Vector2(0, -1), 0);
-    pros::delay(350);
-    xDrive->stop();
+    rollers.flipout();
+}
+
+void in() {
+    rollers.intake();
+    intake.intake(127);
+}
+
+void stopRollers() {
+    rollers.stop();
+    intake.stop();
+}
+
+void shootClean() {
+    rollers.eject();
+}
+
+void shootStaggered() {
+    rollers.shoot();
+}
+
+void shootStaggeredIntake() {
+    rollers.shoot();
+    intake.intake(127);
 }

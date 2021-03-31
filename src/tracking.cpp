@@ -25,7 +25,7 @@ void tracking(void* param) {
 	lLast = 0;
 	rLast = 0;
 	bLast = 0;
-	float x = 0;
+	float x = 24;
 	float y = 0;
 	float left = 0;
 	float right = 0;
@@ -97,6 +97,8 @@ void tracking(void* param) {
 		// Print debug
 		pros::lcd::print(1, "X: %f, Y: %f", trackingData.getX(), trackingData.getY());
 		pros::lcd::print(2, "A: %f", trackingData.getHeading()*180/M_PI);
+		// pros::lcd::print(1, "X: %f, Y: %f", left, right);
+		// pros::lcd::print(2, "A: %f", lateral);
 
 		pros::delay(5);
 	}
@@ -105,7 +107,7 @@ void tracking(void* param) {
 // ----------------- Math utilities ----------------- //
 
 Vector2 toLocalCoordinates(Vector2 vec) {
-	double localAngle = trackingData.getHeading();
+	double localAngle = -trackingData.getHeading();
 	double angle = localAngle;
 
 	return rotateVector(vec, angle);

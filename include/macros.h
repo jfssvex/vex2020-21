@@ -12,6 +12,12 @@ void dropLift();
 void flipout();
 void incrementLift(int dir);
 
+void in();
+void stopRollers();
+void shootClean();
+void shootStaggered();
+void shootStaggeredIntake();
+
 extern bool trayUp;
 extern bool stacking;
 extern bool lifting;
