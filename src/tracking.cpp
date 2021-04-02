@@ -25,8 +25,8 @@ void tracking(void* param) {
 	lLast = 0;
 	rLast = 0;
 	bLast = 0;
-	float x = 24;
-	float y = 0;
+	float x = trackingData.getX();
+	float y = trackingData.getY();
 	float left = 0;
 	float right = 0;
 	float lateral = 0;
