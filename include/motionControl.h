@@ -26,10 +26,11 @@ private:
 
     // constants
     double tolerance;
+    double integralTolerance;
     PIDInfo constants;
 
 public:
-	PIDController(double _target, PIDInfo _constants, double _tolerance);
+	PIDController(double _target, PIDInfo _constants, double _tolerance, double _integralTolerance);
 
     double step(double newSense);
     void reset();

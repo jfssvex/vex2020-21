@@ -1,7 +1,7 @@
 #include "macros.h"
 #include "globals.h"
 #include "main.h"
-#include "control.h"
+#include "motionControl.h"
 
 bool suspendDrive = false;
 

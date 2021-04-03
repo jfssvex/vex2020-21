@@ -7,6 +7,9 @@
 #include <math.h> 
 #define _USE_MATH_DEFINES
 
+double radToDeg(double r);
+double degToRad(double d);
+
 typedef struct Vector2 {
 private:
 	double x, y;
@@ -21,7 +24,7 @@ public:
 	double getMagnitude();
 	double getAngle();
 
-	void normalize();
+	Vector2 normalize();
 
 	// friend keyword allows access to private members
 	friend Vector2 operator + (const Vector2 &v1, const Vector2 &v2);

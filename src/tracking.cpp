@@ -19,6 +19,18 @@ const float bOffset = -BACK_WHEEL_OFFSET;
 #define DRIVE_DEGREE_TO_INCH (M_PI * DRIVE_WHEEL_DIAMETER / 360) 
 #define TRACKING_WHEEL_DEGREE_TO_INCH (M_PI * TRACKING_WHEEL_DIAMETER / 360)
 
+double roundUp(double v, int places) {
+    const double mult = std::pow(10.0, places);
+	return std::ceil(v * mult) / mult;
+}
+
+double radToDeg(double r) {
+	return r * 180 / M_PI;
+}
+double degToRad(double d) {
+	return d * M_PI / 180;
+}
+
 void tracking(void* param) {
 
 	// Initialize variables
@@ -59,11 +71,9 @@ void tracking(void* param) {
 		right += rDist;
 		lateral += bDist;
 
-		//aDelta = (lDist - rDist)/(lrOffset*2.0f);
 		// Calculate arc angle
 		float holdAngle = angle;
 		angle = (right - left)/(lrOffset * 2.0f);
-		// angle = ((leftEncoder * DRIVE_DEGREE_TO_INCH) - (rightEncoder * DRIVE_DEGREE_TO_INCH))/(lrOffset * 2.0f);
 		aDelta = angle - holdAngle;
 
 		// If theres an arc
@@ -189,8 +199,9 @@ double Vector2::getAngle() {
 	return atan2(y, x);
 }
 
-void Vector2::normalize() {
+Vector2 Vector2::normalize() {
 	double divisor = this->getMagnitude();
-	x = x/divisor;
-	y = y/divisor;
+	double nx = x/divisor;
+	double ny = y/divisor;
+	return Vector2(nx, ny);
 }

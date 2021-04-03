@@ -1,13 +1,15 @@
 #include "tracking.h"
 #include "chassis.h"
 #include "globals.h"
-#include "control.h"
+#include "motionControl.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "okapi/api.hpp"
 
 #define TURN_TOLERANCE 0.04
 #define DISTANCE_TOLERANCE 0.7
+#define TURN_INTEGRAL_TOLERANCE 0.3
+#define DISTANCE_INTEGRAL_TOLERANCE 3
 
 using namespace okapi;
 const float driveP = 0.2;
@@ -26,49 +28,20 @@ pros::Motor backLeft(BL_PORT);
 PIDInfo turnConstants(turnP, turnI, turnD);
 PIDInfo driveConstants(driveP, driveI, driveD);
 
+double flipAngle(double angle) {
+	if(angle > 0) {
+		return -(2 * M_PI) + angle;
+	}
+	else {
+		return (2 * M_PI) + angle;
+	}
+}
+
 float getDistance(float tx, float ty, float sx, float sy) {
 	float xDiff = tx - sx;
 	float yDiff = ty - sy;
 	return sqrt((xDiff*xDiff) + (yDiff*yDiff));
 }
-
-// void strafeAndTurnToPoint(Vector2 target, int tangle) {
-// 	tangle = tangle / 180 * M_PI;
-// 	dController.reset();
-// 	aController.reset();
-
-// 	dController.setTarget(0);
-// 	aController.setTarget(tangle);
-
-// 	pros::lcd::print(5, "%i", !(dController.isSettled() && aController.isSettled()));
-
-// 	int count = 0;
-
-// 	do
-// 	{
-// 		count++;
-// 		float newX = trackingData.getX();
-// 		float newY = trackingData.getY();
-// 		float newAngle = -trackingData.getHeading() + (M_PI / 2);
-
-// 		float xVel = dController.step(getDistance(tx, ty, newX, newY));
-// 		float aVel = aController.step(newAngle);
-
-// 		float localX = tx * cos(newAngle) - (ty * sin(newAngle));
-// 		float localY = ty * cos(newAngle) + (tx * sin(newAngle));
-
-// 		float localAngle = atan2(localX, localY) + (M_PI / 4);
-
-// 		frontLeft.move((xVel * sin(localAngle) - aVel) * 127);
-// 		frontRight.move((xVel * cos(localAngle) + aVel) * 127);
-// 		backLeft.move((xVel * cos(localAngle) - aVel) * 127);
-// 		backRight.move((xVel * sin(localAngle) + aVel) * 127);
-
-// 		pros::lcd::print(4, "%i", count);
-// 		pros::delay(20);
-// 	}
-// 	while (!(dController.isSettled() && aController.isSettled()));
-// }
 
 void strafe(Vector2 dir, double turn) {
 	dir = toLocalCoordinates(dir);
@@ -88,13 +61,16 @@ void strafe(Vector2 dir, double turn) {
 
 void strafeToOrientation(Vector2 target, double angle) {
 	double time = pros::millis();
-	angle = angle*PI/180;
-	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE);
-	PIDController turnController(angle, turnConstants, TURN_TOLERANCE);
+    angle = angle * M_PI / 180;
+	if (abs(angle - trackingData.getHeading()) > degToRad(180)) {
+		angle = flipAngle(angle);
+	}
+	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
+	PIDController turnController(angle, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
 
 	do {
-		Vector2 delta = trackingData.getPos() - target;
-		float strVel = distanceController.step(delta.getMagnitude());
+		Vector2 delta = target - trackingData.getPos();
+		float strVel = -distanceController.step(delta.getMagnitude());
 		Vector2 driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
 		float tVel = 2 * turnController.step(trackingData.getHeading());
 
@@ -110,14 +86,12 @@ void strafeToOrientation(Vector2 target, double angle) {
 
 void strafeToPoint(Vector2 target) {
 	double time = pros::millis();
-	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE);
+	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
 
 	do {
-		Vector2 delta = trackingData.getPos() - target;
-		float vel = distanceController.step(delta.getMagnitude());
+		Vector2 delta = target - trackingData.getPos();
+		float vel = -distanceController.step(delta.getMagnitude());
 		Vector2 driveVec = rotateVector(Vector2(vel, 0), delta.getAngle());
-		printf("X: %f, Y: %f", driveVec.getX(), driveVec.getY());
-		pros::lcd::print(4, "X: %f, Y: %f", driveVec.getX(), driveVec.getY());
 		strafe(driveVec, 0);
 
 		if(pros::millis() - time > 4000) {
@@ -129,9 +103,13 @@ void strafeToPoint(Vector2 target) {
 }
 
 void turnToAngle(double target) {
-	target = target*PI/180;
-	double time = pros::millis();
-	PIDController turnController(target, turnConstants, TURN_TOLERANCE);
+    target = target * M_PI / 180;
+	if(abs(target - trackingData.getHeading()) > degToRad(180)) {
+		target = flipAngle(target);
+	}
+
+    double time = pros::millis();
+	PIDController turnController(target, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
 
 	do {
 		float vel = turnController.step(trackingData.getHeading());
@@ -151,11 +129,12 @@ PIDInfo::PIDInfo(double _p, double _i, double _d) {
     this->d = _d;
 }
 
-PIDController::PIDController(double _target, PIDInfo _constants, double _tolerance) {
+PIDController::PIDController(double _target, PIDInfo _constants, double _tolerance, double _integralTolerance = 1) {
 	this->target = _target;
     this->lastError = target;
     this->constants = _constants;
     this->tolerance = _tolerance;
+	this->integralTolerance = _integralTolerance;
 }
 
 double PIDController::step(double newSense) {
@@ -167,7 +146,7 @@ double PIDController::step(double newSense) {
     derivative = error - lastError;
     lastError = error;
     // Disable the integral until it enters a usable range of error
-    if(error == 0 || abs(error) > 1) {
+    if(error == 0 || abs(error) > integralTolerance) {
         integral = 0;
     }
     speed = (constants.p * error) + (constants.i * integral) + (constants.d * derivative);
@@ -185,6 +164,7 @@ double PIDController::step(double newSense) {
 		settling = false;
 		settled = false;
 	}
+
     return speed;
 }
 
