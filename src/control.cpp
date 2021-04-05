@@ -7,11 +7,13 @@
 #include "okapi/api.hpp"
 
 #define TURN_TOLERANCE 0.04
-#define DISTANCE_TOLERANCE 0.7
+#define DISTANCE_TOLERANCE 1
+#define TURN_INTEGRAL_TOLERANCE 0.17
+#define DISTANCE_INTEGRAL_TOLERANCE 5
 
 using namespace okapi;
 const float driveP = 0.2;
-const float driveI = 0.0000000001;
+const float driveI = 0.000001;
 const float driveD = 0.1;
 
 const float turnP = 1.5;
@@ -87,10 +89,13 @@ void strafe(Vector2 dir, double turn) {
 }
 
 void strafeToOrientation(Vector2 target, double angle) {
+	turnToAngle(angle);
+	strafeToPoint(target);
+
 	double time = pros::millis();
 	angle = angle*PI/180;
-	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE);
-	PIDController turnController(angle, turnConstants, TURN_TOLERANCE);
+	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
+	PIDController turnController(angle, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
 
 	do {
 		Vector2 delta = trackingData.getPos() - target;
@@ -110,7 +115,7 @@ void strafeToOrientation(Vector2 target, double angle) {
 
 void strafeToPoint(Vector2 target) {
 	double time = pros::millis();
-	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE);
+	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
 
 	do {
 		Vector2 delta = trackingData.getPos() - target;
@@ -120,7 +125,7 @@ void strafeToPoint(Vector2 target) {
 		pros::lcd::print(4, "X: %f, Y: %f", driveVec.getX(), driveVec.getY());
 		strafe(driveVec, 0);
 
-		if(pros::millis() - time > 4000) {
+		if(pros::millis() - time > 3000) {
 			break;
 		}
 
@@ -131,13 +136,13 @@ void strafeToPoint(Vector2 target) {
 void turnToAngle(double target) {
 	target = target*PI/180;
 	double time = pros::millis();
-	PIDController turnController(target, turnConstants, TURN_TOLERANCE);
+	PIDController turnController(target, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
 
 	do {
 		float vel = turnController.step(trackingData.getHeading());
 		strafe(Vector2(0, 0), vel);
 
-		if(pros::millis() - time > 4000) {
+		if(pros::millis() - time > 3000) {
 			break;
 		}
 
@@ -151,11 +156,12 @@ PIDInfo::PIDInfo(double _p, double _i, double _d) {
     this->d = _d;
 }
 
-PIDController::PIDController(double _target, PIDInfo _constants, double _tolerance) {
+PIDController::PIDController(double _target, PIDInfo _constants, double _tolerance, double _integralTolerance) {
 	this->target = _target;
     this->lastError = target;
     this->constants = _constants;
     this->tolerance = _tolerance;
+	this->integralTolerance = _integralTolerance;
 }
 
 double PIDController::step(double newSense) {
@@ -163,11 +169,15 @@ double PIDController::step(double newSense) {
     // calculate error terms
     sense = newSense;
     error = target - sense;
+	if(first) {
+		lastError = error;
+		first = false;
+	}
     integral += error;
     derivative = error - lastError;
     lastError = error;
     // Disable the integral until it enters a usable range of error
-    if(error == 0 || abs(error) > 1) {
+    if(error == 0 || abs(error) > integralTolerance) {
         integral = 0;
     }
     speed = (constants.p * error) + (constants.i * integral) + (constants.d * derivative);

@@ -126,7 +126,7 @@ void myOPControl() {
 			shotTime = pros::millis();
 		}
 		if(pros::millis() - shotTime > 150) {
-			intake.intake(127);
+			// intake.intake(127);
 		}
 	}
 	else if (master.getDigital(ControllerDigital::X)) {

@@ -42,9 +42,9 @@ void myAutonomous() {
 	in();
 	strafeToPoint(Vector2(24, 18));
 	stopRollers();
-	strafeToOrientation(Vector2(5.5, 5.5), 135);
+	strafeToOrientation(Vector2(6.5, 5.5), 135);
 	shootStaggered();
-	pros::delay(600);
+	pros::delay(800);
 	stopRollers();
 	strafeToPoint(Vector2(24, 18));
 	Vector2 secondBall(36 + 24, 38);
@@ -53,23 +53,46 @@ void myAutonomous() {
 	strafeToPoint(secondBall);
 	pros::delay(400);
 	stopRollers();
-	turnToAngle(-180);
-	strafeToPoint(Vector2(59, 11));
+	turnToAngle(-185);
+	strafeToPoint(Vector2(56, 10));
 	shootStaggered();
-	pros::delay(1000);
+	pros::delay(1200);
 	stopRollers();
 	strafeToPoint(secondBall);
-	Vector2 thirdBall(secondBall.getX() + 36, secondBall.getY() - 24);
+	Vector2 thirdBall(secondBall.getX() + 36, secondBall.getY() - 22);
 	turnToAngle(radToDeg((thirdBall - trackingData.getPos()).getAngle()) - 90);
 	in();
 	strafeToPoint(thirdBall);
 	pros::delay(400);
 	stopRollers();
 	turnToAngle(-135);
-	strafeToOrientation(Vector2(115, 5), -135);
+	strafeToOrientation(Vector2(110, -2), -135);
 	shootStaggeredIntake();
 	pros::delay(1000);
 	stopRollers();
+
+    strafeToPoint(trackingData.getPos() + Vector2(-20, 20));
+    in();
+    strafeToOrientation(Vector2(102.5, 45), -10);
+    strafeToPoint(Vector2(102.5, 56));
+    turnToAngle(-90);
+    stopRollers();
+    strafeToPoint(Vector2(110, 56));
+    shootStaggered();
+    pros::delay(600);
+    stopRollers();
+    strafeToPoint(trackingData.getPos() + Vector2(-20, 0));
+
+    Vector2 topRightBall = thirdBall + Vector2(0, 86);
+    in();
+    strafeToOrientation(topRightBall, 0);
+    turnToAngle(-50);
+    stopRollers();
+    strafeToPoint(topRightBall + Vector2(20, 10));
+    shootStaggered();
+    pros::delay(600);
+    stopRollers();
+
 
 	//Auto routine
 	// rollers.shoot();
