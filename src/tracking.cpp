@@ -123,6 +123,16 @@ Vector2 toLocalCoordinates(Vector2 vec) {
 	return rotateVector(vec, angle);
 }
 
+Vector2 toGlobalCoordinates(Vector2 vec) {
+	double localAngle = trackingData.getHeading();
+
+	return rotateVector(vec, localAngle);
+}
+
+double dot(Vector2 v1, Vector2 v2) {
+	return (v1.getX() * v2.getX()) + (v1.getY() * v2.getY());
+}
+
 Vector2 rotateVector(Vector2 vec, double angle) {
 	// x = cos(a), y = sin(a)
 	// cos(a + b) = cos(a)cos(b) - sin(a)sin(b)
@@ -153,10 +163,17 @@ double TrackingData::getHeading() {
 Vector2 TrackingData::getPos() {
 	return pos;
 }
+Vector2 TrackingData::getForward() {
+	return toGlobalCoordinates(Vector2(0, 1));
+}
 
 void TrackingData::update(double _x, double _y, double _h) {
 	this->pos = Vector2(_x, _y);
 	this->heading = fmod(_h, 2 * M_PI);
+}
+void TrackingData::update(Vector2 _pos, double _h) {
+	this->pos = _pos;
+	this->heading = _h;
 }
 
 // ----------------- Vector2 Struct ----------------- //

@@ -44,8 +44,10 @@ public:
 	double getY();
 	double getHeading();
 	Vector2 getPos();
+	Vector2 getForward();
 
 	void update(double _x, double _y, double _h);
+	void update(Vector2 _pos, double _h);
 
 } TrackingData;
 
@@ -55,5 +57,7 @@ public:
 void tracking(void* param);
 Vector2 rotateVector(Vector2 vec, double angle);
 Vector2 toLocalCoordinates(Vector2 vec);
+Vector2 toGlobalCoordinates(Vector2 vec);
+double dot(Vector2 v1, Vector2 v2);
 
 #endif

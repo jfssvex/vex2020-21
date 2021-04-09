@@ -24,6 +24,7 @@ extern pros::ADIPotentiometer liftPot;
 extern pros::ADIEncoder backTrackingWheel;
 extern pros::ADIEncoder rightTrackingWheel;
 extern pros::ADIEncoder leftTrackingWheel;
+extern pros::ADIButton alignerSwitch;
 
 extern TrackingData trackingData;
 

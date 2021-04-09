@@ -5,11 +5,15 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "okapi/api.hpp"
+#include "macros.h"
 
-#define TURN_TOLERANCE 0.04
-#define DISTANCE_TOLERANCE 0.7
-#define TURN_INTEGRAL_TOLERANCE 0.3
-#define DISTANCE_INTEGRAL_TOLERANCE 3
+#define TURN_TOLERANCE 0.04 			// rad
+#define DISTANCE_TOLERANCE 0.7 			// inch
+#define TURN_INTEGRAL_TOLERANCE 0.3 	// rad
+#define DISTANCE_INTEGRAL_TOLERANCE 3 	// inch
+
+#define PID_TIMEOUT 4000 				// ms
+#define SENSOR_INTERRUPT_TIMEOUT 250 	// ms
 
 using namespace okapi;
 const float driveP = 0.2;
@@ -59,6 +63,89 @@ void strafe(Vector2 dir, double turn) {
 	backRight.move((xVel + yVel + turn) / scalar * 127);
 }
 
+void strafeRelative(Vector2 offset, double aOffset) {
+	if(offset.getMagnitude() == 0) {
+		turnToAngle(trackingData.getHeading() + aOffset);
+	}
+	else if(aOffset == 0) {
+		strafeToPoint(trackingData.getPos() + offset);
+	}
+	else {
+		strafeToOrientation(trackingData.getPos() + offset, trackingData.getHeading() + aOffset);
+	}
+	return;
+}
+
+void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
+	// Set up controllers
+	Vector2 extDir = (goal - Vector2(70, 70)).normalize();
+	// target somewhere beyond the goal to force the button to trigger
+	Vector2 goalOvershoot = goal + extDir * 6;
+	double time = pros::millis();
+	angle = angle * M_PI / 180;
+	if (abs(angle - trackingData.getHeading()) > degToRad(180)) {
+		angle = flipAngle(angle);
+	}
+	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
+	PIDController turnController(angle, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
+	bool sensorInterrupt = false;
+	auto interruptTime = pros::millis();
+
+	if(intake) {
+		in();
+	}
+
+	do {
+		if(alignerSwitch.get_new_press()) {
+			sensorInterrupt = true;
+			interruptTime = pros::millis();
+		}
+		else if(!alignerSwitch.get_value()) {
+			sensorInterrupt = false;
+		}
+
+		// Angle controller
+		float tVel = turnController.step(trackingData.getHeading());
+
+		Vector2 delta = goalOvershoot - trackingData.getPos();
+		Vector2 dNorm = delta.normalize();
+
+		// Get the "forward" vector and calculate the dot product
+		Vector2 alignment = rotateVector(dNorm, turnController.getError());
+		float dotScalar = dot(alignment, dNorm);
+
+		// Step drive PID if dot is not negative
+		Vector2 driveVec(0, 0);
+		if(dotScalar > 0) {
+			float strVel = -distanceController.step(delta.getMagnitude() * dotScalar);
+			driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
+		}
+
+		strafe(driveVec, tVel);
+
+		if(pros::millis() - time > 4000) {
+			break;
+		}
+
+		pros::delay(20);
+	} while ((!distanceController.isSettled() || !turnController.isSettled())
+		&& (!sensorInterrupt || pros::millis() - interruptTime > SENSOR_INTERRUPT_TIMEOUT));
+	
+	// recalibrate position
+	trackingData.update(goal, angle);
+
+	if(intake) {
+		if(balls == 1) { shootCleanIntake(balls); }
+		else { shootStaggeredIntake(balls); }
+	}
+	else {
+		if (balls == 1) { shootClean(balls); }
+		else { shootStaggered(balls); }
+	}
+
+	stopRollers();
+}
+
 void strafeToOrientation(Vector2 target, double angle) {
 	double time = pros::millis();
     angle = angle * M_PI / 180;
@@ -69,10 +156,23 @@ void strafeToOrientation(Vector2 target, double angle) {
 	PIDController turnController(angle, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
 
 	do {
-		Vector2 delta = target - trackingData.getPos();
-		float strVel = -distanceController.step(delta.getMagnitude());
-		Vector2 driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
-		float tVel = 2 * turnController.step(trackingData.getHeading());
+		// Angle controller
+		float tVel = turnController.step(trackingData.getHeading());
+
+		// Distance controller
+		Vector2 delta = target - trackingData.getPos(); // distance vector
+		Vector2 dNorm = delta.normalize();
+
+		// Get the "forward" vector and calculate the dot product
+		Vector2 alignment = rotateVector(dNorm, turnController.getError());
+		float dotScalar = dot(alignment, dNorm);
+
+		// Step drive PID if dot is not negative
+		Vector2 driveVec(0, 0);
+		if(dotScalar > 0) {
+			float strVel = -distanceController.step(delta.getMagnitude() * dotScalar);
+			driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
+		}
 
 		strafe(driveVec, tVel);
 

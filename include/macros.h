@@ -5,8 +5,9 @@
 void flipout();
 void in();
 void stopRollers();
-void shootClean();
-void shootStaggered();
-void shootStaggeredIntake();
+void shootClean(uint8_t balls);
+void shootStaggered(uint8_t balls);
+void shootCleanIntake(uint8_t balls);
+void shootStaggeredIntake(uint8_t balls);
 
 extern bool suspendDrive;

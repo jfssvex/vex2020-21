@@ -170,7 +170,6 @@ void myOPControl() {
 	if(!suspendDrive && !strafing)
 		xDrive->xArcade(reqRSpeed, reqLSpeed, reqTSpeed);
 
-	// Diagnostics
 	pros::delay(10);
 	}
 }

@@ -37,8 +37,14 @@
 #define BOTROLLER_PORT 13
 #define TOPROLLER_PORT 14
 
-#define TRAY_PORT 101
-#define LIFT_PORT 102
+// Sensor ports
+#define ALIGNER_SWITCH_PORT 'G'
+#define RIGHT_TRACK_TOP 'E'
+#define RIGHT_TRACK_BOT 'F'
+#define LEFT_TRACK_TOP 'A'
+#define LEFT_TRACK_BOT 'B'
+#define BACK_TRACK_TOP 'C'
+#define BACK_TRACK_BOT 'D'
 
 #define AUTO_SPEED 80
 #define INTAKE_SPEED 120

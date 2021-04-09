@@ -68,8 +68,7 @@ void fullAuto() {
 
     // First goal
     strafeToOrientation(goalBL, 135);
-    shootStaggered();
-    pros::delay(500);
+    shootStaggered(1);
     stopRollers();
 
     // Second ball
@@ -84,8 +83,7 @@ void fullAuto() {
 
     // Second goal
     strafeToOrientation(goalCL, 90);
-    shootStaggered();
-    pros::delay(1000);
+    shootStaggered(2);
     stopRollers();
 
     // Fourth and fifth balls
@@ -98,8 +96,7 @@ void fullAuto() {
 
     // Third goal
     strafeToOrientation(goalTL, 45);
-    shootStaggered();
-    pros::delay(500);
+    shootStaggered(1);
     stopRollers();
 
     // Sixth ball
@@ -110,8 +107,7 @@ void fullAuto() {
     // Fourth goal
     stopRollers();
     strafeToOrientation(goalTC, 0);
-    shootStaggered();
-    pros::delay(1000);
+    shootStaggered(2);
     stopRollers();
 
     // Seventh ball
@@ -123,8 +119,7 @@ void fullAuto() {
     // Fifth goal
     stopRollers();
     strafeToOrientation(goalTR, -45);
-    shootStaggered();
-    pros::delay(500);
+    shootStaggered(1);
     stopRollers();
 
     // Eighth ball
@@ -136,8 +131,7 @@ void fullAuto() {
     // Sixth goal
     stopRollers();
     strafeToOrientation(goalCR, -90);
-    shootStaggered();
-    pros::delay(500);
+    shootStaggered(1);
     stopRollers();
 
     // Ninth ball
@@ -150,8 +144,7 @@ void fullAuto() {
     // Seventh goal
     stopRollers();
     strafeToOrientation(goalBR, -135);
-    shootStaggered();
-    pros::delay(500);
+    shootStaggered(1);
     stopRollers();
 
     // Tenth ball
@@ -163,8 +156,7 @@ void fullAuto() {
 
     // Eighth goal
     strafeToOrientation(goalBC, 180);
-    shootStaggered();
-    pros::delay(500);
+    shootStaggered(1);
     stopRollers();
 
     // Last goal
@@ -172,7 +164,7 @@ void fullAuto() {
     turnToAngle(0);
     in();
     strafeToPoint(Vector2(72.5, 64.5));
-    shootStaggeredIntake();
+    shootStaggeredIntake(3);
 }
 
 void homeRowAuto() {
@@ -186,8 +178,7 @@ void homeRowAuto() {
 
     // First goal
     strafeToOrientation(goalBL, 135);
-    shootStaggered();
-    pros::delay(600);
+    shootStaggered(1);
     stopRollers();
 
     // Second ball
@@ -199,8 +190,7 @@ void homeRowAuto() {
 
     // Second goal
     strafeToOrientation(goalBC, 180);
-    shootStaggered();
-    pros::delay(1000);
+    shootStaggered(2);
     stopRollers();
 
     // Third ball
@@ -213,8 +203,7 @@ void homeRowAuto() {
     // Third goal
     turnToAngle(-135);
     strafeToOrientation(goalBR, -135);
-    shootStaggered();
-    pros::delay(1000);
+    shootStaggered(1);
     stopRollers();
 
     // Fourth ball
@@ -230,8 +219,7 @@ void homeRowAuto() {
 
     // Fourth goal
     strafeToOrientation(goalCR, -90);
-    shootStaggered();
-    pros::delay(1000);
+    shootStaggered(2);
     stopRollers();
 
     // Sixth ball
@@ -243,7 +231,6 @@ void homeRowAuto() {
 
     // Fifth goal
     strafeToOrientation(goalTR, -45);
-    shootStaggered();
-    pros::delay(500);
+    shootStaggered(1);
     stopRollers();
 }

@@ -19,10 +19,11 @@ void nullTask(void *param) {
 }
 pros::Task update(nullTask, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "null");
 
-pros::ADIEncoder backTrackingWheel('C', 'D', true);
-pros::ADIEncoder leftTrackingWheel('A', 'B', false);
-pros::ADIEncoder rightTrackingWheel('E', 'F', true);
+pros::ADIEncoder backTrackingWheel(BACK_TRACK_TOP, BACK_TRACK_BOT, true);
+pros::ADIEncoder leftTrackingWheel(LEFT_TRACK_TOP, LEFT_TRACK_BOT, false);
+pros::ADIEncoder rightTrackingWheel(RIGHT_TRACK_TOP, RIGHT_TRACK_BOT, true);
 TrackingData trackingData(24, 0, 0);
+pros::ADIButton alignerSwitch(ALIGNER_SWITCH_PORT);
 
 using namespace okapi::literals;
 
