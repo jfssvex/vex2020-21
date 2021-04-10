@@ -107,8 +107,6 @@ void tracking(void* param) {
 		// Print debug
 		pros::lcd::print(1, "X: %f, Y: %f", trackingData.getX(), trackingData.getY());
 		pros::lcd::print(2, "A: %f", trackingData.getHeading()*180/M_PI);
-		// pros::lcd::print(1, "X: %f, Y: %f", left, right);
-		// pros::lcd::print(2, "A: %f", lateral);
 
 		pros::delay(5);
 	}
@@ -118,9 +116,8 @@ void tracking(void* param) {
 
 Vector2 toLocalCoordinates(Vector2 vec) {
 	double localAngle = -trackingData.getHeading();
-	double angle = localAngle;
 
-	return rotateVector(vec, angle);
+	return rotateVector(vec, localAngle);
 }
 
 Vector2 toGlobalCoordinates(Vector2 vec) {
