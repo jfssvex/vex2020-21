@@ -29,14 +29,14 @@ void updateSysMan(void* param) {
 }
 
 // Goals
-Vector2 goalBL(16, 19.5);
+Vector2 goalBL(17.5, 5.5);
 Vector2 goalCL(20, 74);
 Vector2 goalTL(15, 128);
 Vector2 goalTC(74, 127);
 Vector2 goalTR(130, 131);
-Vector2 goalCR(122.5, 76);
-Vector2 goalBR(128, 20);
-Vector2 goalBC(73, 24);
+Vector2 goalCR(122, 67);
+Vector2 goalBR(140-17.5, 5.5);
+Vector2 goalBC(67, 7);
 
 void fullAuto();
 void homeRowAuto();
@@ -49,48 +49,48 @@ void myAutonomous() {
 	flipout();
 	pros::delay(400);
 	in();
-	strafeToPoint(Vector2(24, 18));
+	strafeRelative(Vector2(0, 18), 0);
 	stopRollers();
-	strafeToOrientation(Vector2(6.5, 5.5), 135);
-	shootStaggered(1);
+    alignAndShoot(goalBL, 135, 1);
 	stopRollers();
 	strafeToPoint(Vector2(24, 18));
-	Vector2 secondBall(36 + 24, 38);
+	Vector2 secondBall(36 + 36, 44);
 	turnToAngle(radToDeg((secondBall-trackingData.getPos()).getAngle()) - 90);
 	in();
 	strafeToPoint(secondBall);
 	pros::delay(400);
 	stopRollers();
 	turnToAngle(-185);
-	strafeToPoint(Vector2(56, 10));
-	shootStaggered(2);
+	// strafeToPoint(Vector2(56, 10));
+	// shootStaggered(2);
+    alignAndShoot(goalBC, radToDeg(trackingData.getHeading()), 2);
 	stopRollers();
 	strafeToPoint(secondBall);
-	Vector2 thirdBall(secondBall.getX() + 36, secondBall.getY() - 22);
+	Vector2 thirdBall(secondBall.getX() + 36, secondBall.getY() - 26);
 	turnToAngle(radToDeg((thirdBall - trackingData.getPos()).getAngle()) - 90);
 	in();
 	strafeToPoint(thirdBall);
 	pros::delay(400);
 	stopRollers();
 	turnToAngle(-135);
-	strafeToOrientation(Vector2(110, -2), -135);
-	shootStaggeredIntake(1);
+	// strafeToOrientation(Vector2(110, -2), -135);
+	// shootStaggeredIntake(1);
+    alignAndShoot(goalBR, -135, 1);
 	stopRollers();
 
-    strafeToPoint(trackingData.getPos() + Vector2(-20, 20));
+    strafeRelative(Vector2(-20, 20));
     in();
-    strafeToOrientation(Vector2(102.5, 45), -10);
-    strafeToPoint(Vector2(102.5, 56));
+    strafeToOrientation(Vector2(114.5, 45), -10);
+    strafeToPoint(Vector2(114.5, 67));
     turnToAngle(-90);
     stopRollers();
-    strafeToPoint(Vector2(110, 56));
-    shootStaggered(2);
+    alignAndShoot(goalCR, -90, 1);
     stopRollers();
-    strafeToPoint(trackingData.getPos() + Vector2(-20, 0));
+    strafeRelative(Vector2(-20, 0));
 
     Vector2 topRightBall = thirdBall + Vector2(0, 86);
     in();
-    strafeToOrientation(topRightBall, 0);
+    strafeToOrientation(topRightBall, -1);
     turnToAngle(-50);
     stopRollers();
     strafeToPoint(topRightBall + Vector2(20, 10));

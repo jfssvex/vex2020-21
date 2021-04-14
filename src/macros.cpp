@@ -7,7 +7,7 @@ bool suspendDrive = false;
 
 int callbackCount = 0;
 
-const int initialShotDelay = 600;         // ms
+const int initialShotDelay = 400;       // ms
 const int subsequentShotDelay = 400;    // ms
 
 void flipout() {

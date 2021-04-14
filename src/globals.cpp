@@ -22,7 +22,7 @@ pros::Task update(nullTask, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DE
 pros::ADIEncoder backTrackingWheel(BACK_TRACK_TOP, BACK_TRACK_BOT, true);
 pros::ADIEncoder leftTrackingWheel(LEFT_TRACK_TOP, LEFT_TRACK_BOT, false);
 pros::ADIEncoder rightTrackingWheel(RIGHT_TRACK_TOP, RIGHT_TRACK_BOT, true);
-TrackingData trackingData(24, 0, 0);
+TrackingData trackingData(36, 0, 0);
 pros::ADIButton alignerSwitch(ALIGNER_SWITCH_PORT);
 
 using namespace okapi::literals;

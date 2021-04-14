@@ -99,14 +99,25 @@ void tracking(void* param) {
 		float sinP = sin(p);
 
 		// Update the global position
-		y += (localY * cosP) - (localX * sinP);
-		x += (localY * sinP) + (localX * cosP);
+		float dY = (localY * cosP) - (localX * sinP);
+		float dX = (localY * sinP) + (localX * cosP);
 
-		trackingData.update(x, y, angle);
+		trackingData.update(trackingData.getX() + dX, trackingData.getY() +dY, trackingData.getHeading() + aDelta);
 
 		// Print debug
 		pros::lcd::print(1, "X: %f, Y: %f", trackingData.getX(), trackingData.getY());
 		pros::lcd::print(2, "A: %f", trackingData.getHeading()*180/M_PI);
+		// pros::lcd::print(1, "X: %f, Y: %f", left, right);
+		// pros::lcd::print(2, "A: %f", lateral);
+		if(alignerSwitch.get_value()) {
+			pros::lcd::print(3, "PRESSED");
+		}
+		else {
+			pros::lcd::print(3, "DEPRESSED");
+		}
+		pros::lcd::print(4, "%i", alignerSwitch.get_value());
+
+		printf("X: %f, Y: %f, A: %f\n", trackingData.getX(), trackingData.getY(), radToDeg(trackingData.getHeading()));
 
 		pros::delay(5);
 	}
