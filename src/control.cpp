@@ -7,17 +7,17 @@
 #include "okapi/api.hpp"
 #include "macros.h"
 
-#define TURN_TOLERANCE 0.04 			// rad
-#define DISTANCE_TOLERANCE 0.7 			// inch
-#define TURN_INTEGRAL_TOLERANCE 0.3 	// rad
-#define DISTANCE_INTEGRAL_TOLERANCE 3 	// inch
+#define TURN_TOLERANCE 0.04           // rad
+#define DISTANCE_TOLERANCE 0.7        // inch
+#define TURN_INTEGRAL_TOLERANCE 0.3   // rad
+#define DISTANCE_INTEGRAL_TOLERANCE 3 // inch
 
-#define PID_TIMEOUT 4000 				// ms
-#define SENSOR_INTERRUPT_TIMEOUT 250 	// ms
+#define PID_TIMEOUT 4000              // ms
+#define SENSOR_INTERRUPT_TIMEOUT 250  // ms
 
 using namespace okapi;
 const float driveP = 0.2;
-const float driveI = 0.0000000001;
+const float driveI = 0.000001;
 const float driveD = 0.1;
 
 const float turnP = 1.5;
@@ -147,6 +147,9 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 }
 
 void strafeToOrientation(Vector2 target, double angle) {
+	turnToAngle(angle);
+	strafeToPoint(target);
+
 	double time = pros::millis();
     angle = angle * M_PI / 180;
 	if (abs(angle - trackingData.getHeading()) > degToRad(180)) {
@@ -194,7 +197,7 @@ void strafeToPoint(Vector2 target) {
 		Vector2 driveVec = rotateVector(Vector2(vel, 0), delta.getAngle());
 		strafe(driveVec, 0);
 
-		if(pros::millis() - time > 4000) {
+		if(pros::millis() - time > 3000) {
 			break;
 		}
 
@@ -215,7 +218,7 @@ void turnToAngle(double target) {
 		float vel = turnController.step(trackingData.getHeading());
 		strafe(Vector2(0, 0), vel);
 
-		if(pros::millis() - time > 4000) {
+		if(pros::millis() - time > 3000) {
 			break;
 		}
 
@@ -229,7 +232,7 @@ PIDInfo::PIDInfo(double _p, double _i, double _d) {
     this->d = _d;
 }
 
-PIDController::PIDController(double _target, PIDInfo _constants, double _tolerance, double _integralTolerance = 1) {
+PIDController::PIDController(double _target, PIDInfo _constants, double _tolerance, double _integralTolerance) {
 	this->target = _target;
     this->lastError = target;
     this->constants = _constants;
@@ -242,6 +245,10 @@ double PIDController::step(double newSense) {
     // calculate error terms
     sense = newSense;
     error = target - sense;
+	if(first) {
+		lastError = error;
+		first = false;
+	}
     integral += error;
     derivative = error - lastError;
     lastError = error;
