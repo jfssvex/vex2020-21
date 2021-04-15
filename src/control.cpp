@@ -13,7 +13,6 @@
 #define DISTANCE_INTEGRAL_TOLERANCE 3 // inch
 
 #define PID_TIMEOUT 4000              // ms
-#define SENSOR_INTERRUPT_TIMEOUT 1  // ms
 
 using namespace okapi;
 const float driveP = 0.2;
@@ -97,6 +96,7 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 
 	do {
 		if(alignerSwitch.get_new_press()) {
+			sensorInterrupt = true;
 			strafe(Vector2(0, 0), 0);
 			break;
 		}
@@ -125,12 +125,8 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 		}
 
 		pros::delay(20);
-	} while ((!distanceController.isSettled() || !turnController.isSettled())
-		&& (!sensorInterrupt || pros::millis() - interruptTime > SENSOR_INTERRUPT_TIMEOUT));
+	} while ((!distanceController.isSettled() || !turnController.isSettled()) && sensorInterrupt);
 	
-	// recalibrate position
-	// trackingData.update(goal, trackingData.getHeading());
-
 	if(intake) {
 		if(balls == 1) { shootCleanIntake(balls); }
 		else { shootStaggeredIntake(balls); }
