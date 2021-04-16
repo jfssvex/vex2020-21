@@ -76,6 +76,8 @@ void strafeRelative(Vector2 offset, double aOffset) {
 }
 
 void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
+
+	trackingData.suspendAngleModulus();
 	// Set up controllers
 	Vector2 extDir = (goal - Vector2(70, 70)).normalize();
 	// target somewhere beyond the goal to force the button to trigger
@@ -126,6 +128,8 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 
 		pros::delay(20);
 	} while ((!distanceController.isSettled() || !turnController.isSettled()) && sensorInterrupt);
+
+	trackingData.resumeAngleModulus();
 	
 	if(intake) {
 		if(balls == 1) { shootCleanIntake(balls); }
@@ -140,8 +144,10 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 }
 
 void strafeToOrientation(Vector2 target, double angle) {
+	trackingData.suspendAngleModulus();
 	turnToAngle(angle);
 	strafeToPoint(target);
+	trackingData.resumeAngleModulus();
 
 	return;
 
@@ -201,6 +207,8 @@ void strafeToPoint(Vector2 target) {
 }
 
 void turnToAngle(double target) {
+	trackingData.suspendAngleModulus();
+
     target = target * M_PI / 180;
 	if(abs(target - trackingData.getHeading()) > degToRad(180)) {
 		target = flipAngle(target);
@@ -219,6 +227,8 @@ void turnToAngle(double target) {
 
 		pros::delay(20);
 	} while(!turnController.isSettled());
+
+	trackingData.resumeAngleModulus();
 }
 
 PIDInfo::PIDInfo(double _p, double _i, double _d) {

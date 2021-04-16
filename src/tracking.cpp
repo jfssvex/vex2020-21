@@ -177,11 +177,28 @@ Vector2 TrackingData::getForward() {
 
 void TrackingData::update(double _x, double _y, double _h) {
 	this->pos = Vector2(_x, _y);
-	this->heading = fmod(_h, 2 * M_PI);
+	if(!suspendModulus) {
+		this->heading = fmod(_h, 2 * M_PI);
+	}
+	else {
+		this->heading = _h;
+	}
 }
 void TrackingData::update(Vector2 _pos, double _h) {
 	this->pos = _pos;
-	this->heading = _h;
+	if(!suspendModulus) {
+		this->heading = fmod(_h, 2 * M_PI);
+	}
+	else {
+		this->heading = _h;
+	}
+}
+
+void TrackingData::suspendAngleModulus() {
+	suspendModulus = true;
+}
+void TrackingData::resumeAngleModulus() {
+	suspendModulus = false;
 }
 
 // ----------------- Vector2 Struct ----------------- //
