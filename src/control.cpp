@@ -127,16 +127,21 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 		}
 
 		pros::delay(20);
-	} while ((!distanceController.isSettled() || !turnController.isSettled()) && sensorInterrupt);
+	} while ((!distanceController.isSettled() || !turnController.isSettled()) && !sensorInterrupt);
 
 	trackingData.resumeAngleModulus();
+
+	if(balls == 0) {
+		stopRollers();
+		return;
+	}
 	
 	if(intake) {
 		if(balls == 1) { shootCleanIntake(balls); }
 		else { shootStaggeredIntake(balls); }
 	}
 	else {
-		if (balls == 1) { shootClean(balls); }
+		if (balls == 1) { shootStaggered(balls); }
 		else { shootStaggered(balls); }
 	}
 

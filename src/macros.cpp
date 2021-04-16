@@ -7,8 +7,8 @@ bool suspendDrive = false;
 
 int callbackCount = 0;
 
-const int initialShotDelay = 400;       // ms
-const int subsequentShotDelay = 400;    // ms
+const int initialShotDelay = 500;       // ms
+const int subsequentShotDelay = 1000;    // ms
 
 void flipout() {
     rollers.flipout();
@@ -49,4 +49,11 @@ void shootStaggeredIntake(uint8_t balls) {
     rollers.shoot();
     intake.intake(127);
     ballDelay(balls);
+}
+
+void outtake(uint8_t balls) {
+    intake.out(127);
+    rollers.out();
+    ballDelay(balls);
+    stopRollers();
 }
