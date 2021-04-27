@@ -78,15 +78,16 @@ void strafeRelative(Vector2 offset, double aOffset) {
 void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 
 	trackingData.suspendAngleModulus();
-	// Set up controllers
-	Vector2 extDir = (goal - Vector2(70, 70)).normalize();
-	// target somewhere beyond the goal to force the button to trigger
-	Vector2 goalOvershoot = goal + extDir * 6;
 	double time = pros::millis();
 	angle = angle * M_PI / 180;
 	if (abs(angle - trackingData.getHeading()) > degToRad(180)) {
 		angle = flipAngle(angle);
 	}
+
+	// Set up controllers
+	// target somewhere beyond the goal to force the button to trigger
+	Vector2 extDir = (goal - trackingData.getPos()).normalize();
+	Vector2 goalOvershoot = goal + extDir * 6;
 	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
 	PIDController turnController(angle, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
 	bool sensorInterrupt = false;
@@ -97,6 +98,7 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 	}
 
 	do {
+		// Break if the aligner button has been triggered
 		if(alignerSwitch.get_new_press()) {
 			sensorInterrupt = true;
 			strafe(Vector2(0, 0), 0);
