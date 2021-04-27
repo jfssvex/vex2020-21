@@ -7,11 +7,6 @@
 #include "okapi/api.hpp"
 #include "macros.h"
 
-#define TURN_TOLERANCE 0.04           // rad
-#define DISTANCE_TOLERANCE 0.7        // inch
-#define TURN_INTEGRAL_TOLERANCE 0.3   // rad
-#define DISTANCE_INTEGRAL_TOLERANCE 3 // inch
-
 #define PID_TIMEOUT 4000              // ms
 
 using namespace okapi;
@@ -211,7 +206,7 @@ void strafeToPoint(Vector2 target) {
 	} while(!distanceController.isSettled());
 }
 
-void turnToAngle(double target) {
+void turnToAngle(double target, double tolerance) {
 	trackingData.suspendAngleModulus();
 
     target = target * M_PI / 180;
@@ -220,7 +215,7 @@ void turnToAngle(double target) {
 	}
 
     double time = pros::millis();
-	PIDController turnController(target, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
+	PIDController turnController(target, turnConstants, tolerance, TURN_INTEGRAL_TOLERANCE);
 
 	do {
 		float vel = turnController.step(trackingData.getHeading());
