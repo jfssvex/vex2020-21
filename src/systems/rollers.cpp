@@ -58,7 +58,7 @@ void Rollers::update() {
         case OUT_STATE:
             break;
         case SHOOT_STATE:
-            if(pros::millis() - this->timeOfLastChange > 500) {
+            if(pros::millis() - this->timeOfLastChange > 400) {
                 this->botRollerMotor.move(DEFAULT_ROLLER_SPEED);
             }
             else if(pros::millis() - this->timeOfLastChange > 50) {

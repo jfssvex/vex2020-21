@@ -4,6 +4,7 @@
 
 void flipout();
 void in();
+void outtake(uint8_t balls);
 void stopRollers();
 void shootClean(uint8_t balls);
 void shootStaggered(uint8_t balls);

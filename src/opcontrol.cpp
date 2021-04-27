@@ -160,6 +160,7 @@ void myOPControl() {
 	}
 	if(master.getDigital(ControllerDigital::left)) {
 		rollers.flipout();
+		pros::delay(500);
 	}
 
 	// Acceleration curve
