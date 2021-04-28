@@ -19,6 +19,8 @@ typedef struct PIDInfo {
 #define TURN_INTEGRAL_TOLERANCE 0.3   // rad
 #define DISTANCE_INTEGRAL_TOLERANCE 3 // inch
 
+#define MAX_ACCELERATION 10 // 127-scale
+
 typedef struct PIDController {
 private:
 	double sense;
@@ -48,9 +50,9 @@ public:
 } PIDController;
 
 void strafe(Vector2 dir, double turn);
-void strafeToOrientation(Vector2 target, double angle);
-void strafeToPoint(Vector2 target);
+void strafeToOrientation(Vector2 target, double angle, double distanceTolerance = DISTANCE_TOLERANCE, double angleTolerance = TURN_TOLERANCE);
+void strafeToPoint(Vector2 target, double distanceTolerance = DISTANCE_TOLERANCE);
 void turnToAngle(double target, double tolerance = TURN_TOLERANCE);
 
 void strafeRelative(Vector2 offset, double aOffset = 0);
-void alignAndShoot(Vector2 goal, double angle, uint8_t balls = 1, bool intake = false);
+void alignAndShoot(Vector2 goal, double angle, uint8_t balls = 1, bool intake = false, double distanceTolerance = DISTANCE_TOLERANCE, double angleTolerance = TURN_TOLERANCE);

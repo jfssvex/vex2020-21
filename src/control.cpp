@@ -41,6 +41,34 @@ float getDistance(float tx, float ty, float sx, float sy) {
 	return sqrt((xDiff*xDiff) + (yDiff*yDiff));
 }
 
+void stepMotor(pros::Motor motor, float targetSpeed) {
+	float targetRPM = motor.get_target_velocity();
+	auto gearset = motor.get_gearing();
+	float RPMscale;
+
+	switch(gearset) {
+		case(pros::E_MOTOR_GEARSET_36): // red cartridge (torque)
+			RPMscale = 100;
+			break;
+		case(pros::E_MOTOR_GEARSET_18): // green cartridge (high speed)
+			RPMscale = 200;
+			break;
+		case(pros::E_MOTOR_GEARSET_06): // blue cartridge (turbo)
+			RPMscale = 600;
+			break;
+	}
+
+	// Convert to the 127-scale
+	float pastTarget = (targetRPM / RPMscale) * 127;
+
+	// Cap acceleration and drive
+	float delta = targetSpeed - pastTarget;
+	if(abs(delta) > MAX_ACCELERATION) {
+		delta = (delta/abs(delta)) * MAX_ACCELERATION;
+	}
+	motor.move(delta);
+}
+
 void strafe(Vector2 dir, double turn) {
 	dir = toLocalCoordinates(dir);
 	double xVel = dir.getX();
@@ -51,10 +79,10 @@ void strafe(Vector2 dir, double turn) {
 		scalar = abs(xVel) + abs(yVel) + abs(turn);
 	}
 
-	frontLeft.move((xVel + yVel - turn) / scalar * 127);
-	frontRight.move((-xVel + yVel + turn) / scalar * 127);
-	backLeft.move((-xVel + yVel - turn) / scalar * 127);
-	backRight.move((xVel + yVel + turn) / scalar * 127);
+	stepMotor(frontLeft, (xVel + yVel - turn) / scalar * 127);
+	stepMotor(frontRight, (-xVel + yVel + turn) / scalar * 127);
+	stepMotor(backLeft, (-xVel + yVel - turn) / scalar * 127);
+	stepMotor(backRight, (xVel + yVel + turn) / scalar * 127);
 }
 
 void strafeRelative(Vector2 offset, double aOffset) {
@@ -70,7 +98,7 @@ void strafeRelative(Vector2 offset, double aOffset) {
 	return;
 }
 
-void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
+void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake, double distanceTolerance, double angleTolerance) {
 
 	trackingData.suspendAngleModulus();
 	double time = pros::millis();
@@ -83,8 +111,8 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 	// target somewhere beyond the goal to force the button to trigger
 	Vector2 extDir = (goal - trackingData.getPos()).normalize();
 	Vector2 goalOvershoot = goal + extDir * 6;
-	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
-	PIDController turnController(angle, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
+	PIDController distanceController(0, driveConstants, distanceTolerance, DISTANCE_INTEGRAL_TOLERANCE);
+	PIDController turnController(angle, turnConstants, angleTolerance, TURN_INTEGRAL_TOLERANCE);
 	bool sensorInterrupt = false;
 	auto interruptTime = pros::millis();
 
@@ -145,7 +173,7 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake) {
 	stopRollers();
 }
 
-void strafeToOrientation(Vector2 target, double angle) {
+void strafeToOrientation(Vector2 target, double angle, double distanceTolerance, double angleTolerance) {
 	trackingData.suspendAngleModulus();
 	turnToAngle(angle);
 	strafeToPoint(target);
@@ -158,8 +186,8 @@ void strafeToOrientation(Vector2 target, double angle) {
 	if (abs(angle - trackingData.getHeading()) > degToRad(180)) {
 		angle = flipAngle(angle);
 	}
-	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
-	PIDController turnController(angle, turnConstants, TURN_TOLERANCE, TURN_INTEGRAL_TOLERANCE);
+	PIDController distanceController(0, driveConstants, distanceTolerance, DISTANCE_INTEGRAL_TOLERANCE);
+	PIDController turnController(angle, turnConstants, angleTolerance, TURN_INTEGRAL_TOLERANCE);
 
 	do {
 		// Angle controller
@@ -190,9 +218,9 @@ void strafeToOrientation(Vector2 target, double angle) {
 	} while(!distanceController.isSettled() || !turnController.isSettled());
 }
 
-void strafeToPoint(Vector2 target) {
+void strafeToPoint(Vector2 target, double distanceTolerance) {
 	double time = pros::millis();
-	PIDController distanceController(0, driveConstants, DISTANCE_TOLERANCE, DISTANCE_INTEGRAL_TOLERANCE);
+	PIDController distanceController(0, driveConstants, distanceTolerance, DISTANCE_INTEGRAL_TOLERANCE);
 
 	do {
 		Vector2 delta = target - trackingData.getPos();
