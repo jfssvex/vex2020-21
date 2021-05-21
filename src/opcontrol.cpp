@@ -125,7 +125,7 @@ void myOPControl() {
 			rollers.shoot();
 			shotTime = pros::millis();
 		}
-		if(pros::millis() - shotTime > 150) {
+		if(pros::millis() - shotTime > 30) {
 			intake.intake(127);
 		}
 	}
