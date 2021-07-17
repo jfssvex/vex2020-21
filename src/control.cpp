@@ -41,33 +41,34 @@ float getDistance(float tx, float ty, float sx, float sy) {
 	return sqrt((xDiff*xDiff) + (yDiff*yDiff));
 }
 
-void stepMotor(pros::Motor motor, float targetSpeed) {
-	float targetRPM = motor.get_target_velocity();
-	auto gearset = motor.get_gearing();
-	float RPMscale;
+// This doesn't work right now, didn't have time to figure out why
+// void stepMotor(pros::Motor motor, float targetSpeed) {
+// 	float targetRPM = motor.get_target_velocity();
+// 	auto gearset = motor.get_gearing();
+// 	float RPMscale;
 
-	switch(gearset) {
-		case(pros::E_MOTOR_GEARSET_36): // red cartridge (torque)
-			RPMscale = 100;
-			break;
-		case(pros::E_MOTOR_GEARSET_18): // green cartridge (high speed)
-			RPMscale = 200;
-			break;
-		case(pros::E_MOTOR_GEARSET_06): // blue cartridge (turbo)
-			RPMscale = 600;
-			break;
-	}
+// 	switch(gearset) {
+// 		case(pros::E_MOTOR_GEARSET_36): // red cartridge (torque)
+// 			RPMscale = 100;
+// 			break;
+// 		case(pros::E_MOTOR_GEARSET_18): // green cartridge (high speed)
+// 			RPMscale = 200;
+// 			break;
+// 		case(pros::E_MOTOR_GEARSET_06): // blue cartridge (turbo)
+// 			RPMscale = 600;
+// 			break;
+// 	}
 
-	// Convert to the 127-scale
-	float pastTarget = (targetRPM / RPMscale) * 127;
+// 	// Convert to the 127-scale
+// 	float pastTarget = (targetRPM / RPMscale) * 127;
 
-	// Cap acceleration and drive
-	float delta = targetSpeed - pastTarget;
-	if(abs(delta) > MAX_ACCELERATION) {
-		delta = (delta/abs(delta)) * MAX_ACCELERATION;
-	}
-	motor.move(delta);
-}
+// 	// Cap acceleration and drive
+// 	float delta = targetSpeed - pastTarget;
+// 	if(abs(delta) > MAX_ACCELERATION) {
+// 		delta = (delta/abs(delta)) * MAX_ACCELERATION;
+// 	}
+// 	motor.move(delta);
+// }
 
 void strafe(Vector2 dir, double turn) {
 	dir = toLocalCoordinates(dir);
@@ -79,10 +80,16 @@ void strafe(Vector2 dir, double turn) {
 		scalar = abs(xVel) + abs(yVel) + abs(turn);
 	}
 
-	stepMotor(frontLeft, (xVel + yVel - turn) / scalar * 127);
-	stepMotor(frontRight, (-xVel + yVel + turn) / scalar * 127);
-	stepMotor(backLeft, (-xVel + yVel - turn) / scalar * 127);
-	stepMotor(backRight, (xVel + yVel + turn) / scalar * 127);
+	// This doesn't work right now, didn't have time to figure out why
+	// stepMotor(frontLeft, (xVel + yVel - turn) / scalar * 127);
+	// stepMotor(frontRight, (-xVel + yVel + turn) / scalar * 127);
+	// stepMotor(backLeft, (-xVel + yVel - turn) / scalar * 127);
+	// stepMotor(backRight, (xVel + yVel + turn) / scalar * 127);
+
+	frontLeft.move((xVel + yVel - turn) / scalar * 127);
+	frontRight.move((-xVel + yVel + turn) / scalar * 127);
+	backLeft.move((-xVel + yVel - turn) / scalar * 127);
+	backRight.move((xVel + yVel + turn) / scalar * 127);
 }
 
 void strafeRelative(Vector2 offset, double aOffset) {
