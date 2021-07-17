@@ -7,7 +7,7 @@
 // Robot dimensions in inches
 #define DRIVE_WHEEL_DIAMETER 3.25f
 #define TRACKING_WHEEL_DIAMETER 2.75f
-#define WHEELBASE 10.25f
+#define WHEELBASE 10.375f
 #define BACK_WHEEL_OFFSET 5.0f
 
 // allMotors array index --- Drive Motors
@@ -38,11 +38,11 @@
 #define TOPROLLER_PORT 14
 
 // Sensor ports
-#define ALIGNER_SWITCH_PORT 'G'
+#define ALIGNER_SWITCH_PORT 'A'
 #define RIGHT_TRACK_TOP 'E'
 #define RIGHT_TRACK_BOT 'F'
-#define LEFT_TRACK_TOP 'A'
-#define LEFT_TRACK_BOT 'B'
+#define LEFT_TRACK_TOP 'G'
+#define LEFT_TRACK_BOT 'H'
 #define BACK_TRACK_TOP 'C'
 #define BACK_TRACK_BOT 'D'
 

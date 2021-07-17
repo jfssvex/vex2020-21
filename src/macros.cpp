@@ -27,6 +27,8 @@ void stopRollers() {
 void ballDelay(uint8_t balls) {
     auto d = initialShotDelay + (subsequentShotDelay * (balls - 1));
     pros::delay(d);
+
+    printf("%i BALL DELAY \n", balls);
 }
 
 void shootClean(uint8_t balls) {
@@ -55,5 +57,6 @@ void outtake(uint8_t balls) {
     intake.out(127);
     rollers.out();
     ballDelay(balls);
+    pros::delay(200);
     stopRollers();
 }

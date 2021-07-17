@@ -44,6 +44,8 @@ void tracking(void* param) {
 	float lateral = 0;
 	float angle = 0;
 
+	auto printTime = pros::millis();
+
 	// Start tracking loop
 	while(1) {
 		float localX, localY = 0;
@@ -107,17 +109,13 @@ void tracking(void* param) {
 		// Print debug
 		pros::lcd::print(1, "X: %f, Y: %f", trackingData.getX(), trackingData.getY());
 		pros::lcd::print(2, "A: %f", trackingData.getHeading()*180/M_PI);
-		// pros::lcd::print(1, "X: %f, Y: %f", left, right);
-		// pros::lcd::print(2, "A: %f", lateral);
-		if(alignerSwitch.get_value()) {
-			pros::lcd::print(3, "PRESSED");
-		}
-		else {
-			pros::lcd::print(3, "DEPRESSED");
-		}
-		pros::lcd::print(4, "%i", alignerSwitch.get_value());
 
-		printf("X: %f, Y: %f, A: %f\n", trackingData.getX(), trackingData.getY(), radToDeg(trackingData.getHeading()));
+		if(pros::millis() - printTime > 50) {
+			printf("X: %f, Y: %f, A: %f\n", trackingData.getX(), trackingData.getY(), radToDeg(trackingData.getHeading()));
+			printTime = pros::millis();
+			// printf("X: %f, Y: %f", left, right);
+			// printf("A: %f", lateral);
+		}
 
 		pros::delay(5);
 	}
