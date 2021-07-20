@@ -13,6 +13,7 @@ Toggle::Toggle(std::vector<okapi::ControllerDigital> _buttons, okapi::Controller
 }
 
 int Toggle::checkState() {
+    // Check if any of the buttons aren't pressed and return if they're not
     for(int i = 0; i < buttons.size(); i++) {
         if(!controller.getDigital(buttons[i])) {
             held = false;
@@ -20,6 +21,7 @@ int Toggle::checkState() {
         }
     }
 
+    // Swap the state and then return it if the function hasn't exited yets
     if(!held) {
         state = !state;
     }

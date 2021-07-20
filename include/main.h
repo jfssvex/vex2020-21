@@ -66,15 +66,33 @@ extern "C" {
 #endif
 
 #define VISION_PORT 2
+
+// PROS entrypoint functions
 void autonomous(void);
 void initialize(void);
 void disabled(void);
 void competition_initialize(void);
 void opcontrol(void);
+
+/**
+ * @brief Task to update state machines
+ * 
+ * @param param Empty task parameter
+ */
 void updateSysMan(void *param);
+/**
+ * @brief Callback that does nothing to occupy global task objects
+ */
 void nullCallback();
 
+/**
+ * @brief Function autonomous() deflects to so auto can be put in its own file
+ */
 void myAutonomous();
+
+/**
+ * @brief Function opcontrol() deflects to so opcontrol loop can be put in its own file
+ */
 void myOPControl();
 
 static int autonSet;

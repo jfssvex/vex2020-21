@@ -19,6 +19,7 @@ const int initialShotDelay = 500;       // ms
 const int subsequentShotDelay = 1000;    // ms
 
 void flipout() {
+    // Run flipout routine from state machine
     rollers.flipout();
 }
 
@@ -33,6 +34,8 @@ void stopRollers() {
 }
 
 void ballDelay(uint8_t balls) {
+    // Calculate delay based on how many balls are needed
+    // First ball is always faster because of second ball-delay
     auto d = initialShotDelay + (subsequentShotDelay * (balls - 1));
     pros::delay(d);
 

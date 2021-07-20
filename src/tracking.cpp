@@ -145,6 +145,7 @@ Vector2 toGlobalOrientation(Vector2 vec) {
 }
 
 double dot(Vector2 v1, Vector2 v2) {
+	// a dot b = a_1 * b_1 + a_2 * b_2 ... + a_n * b_n
 	return (v1.getX() * v2.getX()) + (v1.getY() * v2.getY());
 }
 
@@ -185,6 +186,7 @@ Vector2 TrackingData::getForward() {
 void TrackingData::update(double _x, double _y, double _h) {
 	this->pos = Vector2(_x, _y);
 	if(!suspendModulus) {
+		// Make sure heading is between -2pi and +2pi
 		this->heading = fmod(_h, 2 * M_PI);
 	}
 	else {
@@ -194,6 +196,7 @@ void TrackingData::update(double _x, double _y, double _h) {
 void TrackingData::update(Vector2 _pos, double _h) {
 	this->pos = _pos;
 	if(!suspendModulus) {
+		// Make sure heading is between -2pi and +2pi
 		this->heading = fmod(_h, 2 * M_PI);
 	}
 	else {

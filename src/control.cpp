@@ -34,6 +34,13 @@ pros::Motor backLeft(BL_PORT);
 PIDInfo turnConstants(turnP, turnI, turnD);
 PIDInfo driveConstants(driveP, driveI, driveD);
 
+/**
+ * @brief Flips an angle from negative to positive.
+ * Ex: -pi = +pi
+ * 
+ * @param angle Angle to flip in radians
+ * @return double - Equivalent angle with flipped sign in radians
+ */
 double flipAngle(double angle) {
 	if(angle > 0) {
 		return -(2 * M_PI) + angle;
@@ -41,12 +48,6 @@ double flipAngle(double angle) {
 	else {
 		return (2 * M_PI) + angle;
 	}
-}
-
-float getDistance(float tx, float ty, float sx, float sy) {
-	float xDiff = tx - sx;
-	float yDiff = ty - sy;
-	return sqrt((xDiff*xDiff) + (yDiff*yDiff));
 }
 
 /* This doesn't work right now, didn't have time to figure out why
@@ -79,10 +80,12 @@ void stepMotor(pros::Motor motor, float targetSpeed) {
 } */
 
 void strafe(Vector2 dir, double turn) {
+	// Get the direction relative to the robot's orientation
 	dir = toLocalOrientation(dir);
 	double xVel = dir.getX();
 	double yVel = dir.getY();
 
+	// Scale everything so no motor is being driven at >100%
 	double scalar = 1;
 	if(abs(xVel) + abs(yVel) + abs(turn) > 1) {
 		scalar = abs(xVel) + abs(yVel) + abs(turn);
@@ -94,6 +97,8 @@ void strafe(Vector2 dir, double turn) {
 	// stepMotor(backLeft, (-xVel + yVel - turn) / scalar * 127);
 	// stepMotor(backRight, (xVel + yVel + turn) / scalar * 127);
 
+	// Drive motors according to their positions on the robot
+	// The signs are determined by how the wheel would move/turn the robot if set to positive power
 	frontLeft.move((xVel + yVel - turn) / scalar * 127);
 	frontRight.move((-xVel + yVel + turn) / scalar * 127);
 	backLeft.move((-xVel + yVel - turn) / scalar * 127);
@@ -101,12 +106,15 @@ void strafe(Vector2 dir, double turn) {
 }
 
 void strafeRelative(Vector2 offset, double aOffset) {
+	// If no position offset, just turn
 	if(offset.getMagnitude() == 0) {
 		turnToAngle(trackingData.getHeading() + aOffset);
 	}
+	// If no angle offset, just strafe
 	else if(aOffset == 0) {
 		strafeToPoint(trackingData.getPos() + offset);
 	}
+	// If both, do both
 	else {
 		strafeToOrientation(trackingData.getPos() + offset, trackingData.getHeading() + aOffset);
 	}
@@ -114,20 +122,24 @@ void strafeRelative(Vector2 offset, double aOffset) {
 }
 
 void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake, double distanceTolerance, double angleTolerance) {
-
+	// Angle modulus is suspended to prevent PID errors. See relevant journal entry for details.
 	trackingData.suspendAngleModulus();
 	double time = pros::millis();
+	// Convert angle to radians and then flip if it makes the turn easier
 	angle = angle * M_PI / 180;
 	if (abs(angle - trackingData.getHeading()) > degToRad(180)) {
 		angle = flipAngle(angle);
 	}
 
-	// Set up controllers
-	// target somewhere beyond the goal to force the button to trigger
+	// Target somewhere beyond the goal to force the button to trigger
 	Vector2 extDir = (goal - trackingData.getPos()).normalize();
 	Vector2 goalOvershoot = goal + extDir * 6;
+
+	// Set up controllers
 	PIDController distanceController(0, driveConstants, distanceTolerance, DISTANCE_INTEGRAL_TOLERANCE);
 	PIDController turnController(angle, turnConstants, angleTolerance, TURN_INTEGRAL_TOLERANCE);
+
+	// Front bumper variables
 	bool sensorInterrupt = false;
 	auto interruptTime = pros::millis();
 
@@ -153,30 +165,36 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake, doubl
 		Vector2 alignment = rotateVector(dNorm, turnController.getError());
 		float dotScalar = dot(alignment, dNorm);
 
-		// Step drive PID if dot is not negative
+		// Step drive PID if dot is not negative. If it is negative (more than 90 deg off) only turn.
 		Vector2 driveVec(0, 0);
 		if(dotScalar > 0) {
 			float strVel = -distanceController.step(delta.getMagnitude() * dotScalar);
 			driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
 		}
 
+		// Move chassis using PID outputs
 		strafe(driveVec, tVel);
 
+		// Timeout in case something goes wrong
 		if(pros::millis() - time > 4000) {
 			break;
 		}
 
 		pros::delay(20);
-	} while ((!distanceController.isSettled() || !turnController.isSettled()) && !sensorInterrupt);
+	} while ((!distanceController.isSettled() || !turnController.isSettled()) && !sensorInterrupt); // Break if both settled or sensor interrupts
 
+	// After loop is complete angle can be reduced again
 	trackingData.resumeAngleModulus();
 
+	// If there are no balls to shoot, stop rollers and exit
 	if(balls == 0) {
 		stopRollers();
 		return;
 	}
 	
+	// Run intakes/uptake rollers based on parameters
 	if(intake) {
+		// shootClean works better when theres 1 ball
 		if(balls == 1) { shootCleanIntake(balls); }
 		else { shootStaggeredIntake(balls); }
 	}
@@ -185,22 +203,23 @@ void alignAndShoot(Vector2 goal, double angle, uint8_t balls, bool intake, doubl
 		else { shootStaggered(balls); }
 	}
 
+	// Stop rollers and exit
 	stopRollers();
 }
 
 void strafeToOrientation(Vector2 target, double angle, double distanceTolerance, double angleTolerance) {
+	// Stop angle reduction for PID reasons. See journal entry for more.
 	trackingData.suspendAngleModulus();
-	turnToAngle(angle);
-	strafeToPoint(target);
-	trackingData.resumeAngleModulus();
 
-	return;
-
+	// Save time for timeout
 	double time = pros::millis();
+	// Flip angle if it makes turning easier
     angle = angle * M_PI / 180;
 	if (abs(angle - trackingData.getHeading()) > degToRad(180)) {
 		angle = flipAngle(angle);
 	}
+
+	// Set up controllers
 	PIDController distanceController(0, driveConstants, distanceTolerance, DISTANCE_INTEGRAL_TOLERANCE);
 	PIDController turnController(angle, turnConstants, angleTolerance, TURN_INTEGRAL_TOLERANCE);
 
@@ -208,71 +227,84 @@ void strafeToOrientation(Vector2 target, double angle, double distanceTolerance,
 		// Angle controller
 		float tVel = turnController.step(trackingData.getHeading());
 
-		// Distance controller
+		// Get the direction to the target
 		Vector2 delta = target - trackingData.getPos(); // distance vector
 		Vector2 dNorm = delta.normalize();
 
 		// Get the "forward" vector and calculate the dot product
+		// This will weight the motion more towards turning which is ideal
 		Vector2 alignment = rotateVector(dNorm, turnController.getError());
 		float dotScalar = dot(alignment, dNorm);
 
-		// Step drive PID if dot is not negative
+		// Step drive PID if dot is not negative. Othwerise just turn
 		Vector2 driveVec(0, 0);
 		if(dotScalar > 0) {
 			float strVel = -distanceController.step(delta.getMagnitude() * dotScalar);
 			driveVec = rotateVector(Vector2(strVel, 0), delta.getAngle());
 		}
 
+		// Move chassis with PID outputs
 		strafe(driveVec, tVel);
 
+		// Timeout if something goes wrong
 		if(pros::millis() - time > 4000) {
 			break;
 		}
 
 		pros::delay(20);
-	} while(!distanceController.isSettled() || !turnController.isSettled());
+	} while(!distanceController.isSettled() || !turnController.isSettled()); // Break when both controllers settle
 }
 
 void strafeToPoint(Vector2 target, double distanceTolerance) {
+	// Get time for timeout and set up controller
 	double time = pros::millis();
 	PIDController distanceController(0, driveConstants, distanceTolerance, DISTANCE_INTEGRAL_TOLERANCE);
 
 	do {
+		// Get the distance to the target to use as PID sense
 		Vector2 delta = target - trackingData.getPos();
 		float vel = -distanceController.step(delta.getMagnitude());
+		// Multiply direction vector by speed to strafe by
 		Vector2 driveVec = rotateVector(Vector2(vel, 0), delta.getAngle());
 		strafe(driveVec, 0);
 
+		// Timeout if something goes wrong
 		if(pros::millis() - time > 3000) {
 			break;
 		}
 
 		pros::delay(20);
-	} while(!distanceController.isSettled());
+	} while(!distanceController.isSettled()); // Break when controller settles
 }
 
 void turnToAngle(double target, double tolerance) {
+	// Suspend angle reduction for PID purposes. See journal entry for more.
 	trackingData.suspendAngleModulus();
 
+	// Flip angle if the turning becomes more efficient
     target = target * M_PI / 180;
 	if(abs(target - trackingData.getHeading()) > degToRad(180)) {
 		target = flipAngle(target);
 	}
 
+	// Set up controller and timeout
     double time = pros::millis();
 	PIDController turnController(target, turnConstants, tolerance, TURN_INTEGRAL_TOLERANCE);
 
 	do {
+		// Step controller and drive
 		float vel = turnController.step(trackingData.getHeading());
 		strafe(Vector2(0, 0), vel);
 
+		// Timeout if something goes wrong
 		if(pros::millis() - time > 3000) {
 			break;
 		}
 
 		pros::delay(20);
-	} while(!turnController.isSettled());
+	} while(!turnController.isSettled()); // Break when controller settles
 
+	// Resume angle reduction after PID has completed
 	trackingData.resumeAngleModulus();
 }
 
@@ -306,7 +338,10 @@ double PIDController::step(double newSense) {
     if(error == 0 || abs(error) > integralTolerance) {
         integral = 0;
     }
+	// Calculate output
     speed = (constants.p * error) + (constants.i * integral) + (constants.d * derivative);
+	
+	// Check if loop should settle
     if(abs(error) <= tolerance) {
 		if(!settling) {
 			settleStart = pros::millis();

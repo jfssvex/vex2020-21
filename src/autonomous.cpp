@@ -19,11 +19,6 @@
 using namespace pros;
 extern int auton_id;
 
-/**
- * @brief Task that runs update functions for state machines
- * 
- * @param param Task parameter, nothing passed in
- */
 void updateSysMan(void *param) {
     while (1) {
         intake.update();
@@ -42,14 +37,12 @@ Vector2 goalCR(122, 81);
 Vector2 goalBR(140 - 15.5, 31);
 Vector2 goalBC(69, 12);
 
+// Forward auto routine declarations
 void fullAuto();
 void homeRowAuto();
 
-/**
- * @brief Main autonomous function. Runs during auto skills and match auto after init
- */
 void myAutonomous() {
-    // Initializing state machines and setting up update
+    // Initializing state machines and setting up update task
     update = pros::Task(updateSysMan, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Update system manager");
     rollers.fullReset();
     intake.fullReset();

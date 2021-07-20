@@ -50,6 +50,7 @@ bool SystemManager::timedOut(uint32_t timeout) {
 }
 
 void SystemManager::enable() {
+    // Reenable the state machine. Don't go through changeState() because it'll kick you out
     this->lastState = DISABLED_STATE;
     this->state = this->defaultState;
     this->timeOfLastChange = pros::millis();
@@ -57,9 +58,11 @@ void SystemManager::enable() {
 
 // Virtual functions
 bool SystemManager::changeState(uint8_t newState) {
+    // Check if state change is allowed
     if(this->state == DISABLED_STATE) {
         return false;
     }
+    // Set up state change-related variables
     this->lastState = this->state;
     this->state = newState;
     this->timeOfLastChange = pros::millis();

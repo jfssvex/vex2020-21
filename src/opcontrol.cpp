@@ -21,19 +21,6 @@ LV_IMG_DECLARE(royals);
 #define DEAD_ZONE_TIGHTNESS 100
 
 double const accel = 0.045;
-/**
- * Runs the operator control code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the operator
- * control mode.
- *
- * If no competition control is connected, this function will run immediately
- * following initialize().
- *
- * If the robot is disabled or communications is lost, the
- * operator control task will be stopped. Re-enabling the robot will restart the
- * task, not resume it from where it left off.
- */
 
 using namespace pros;
 using namespace okapi;
@@ -43,12 +30,15 @@ extern float x;
 extern float y;
 extern float theta;
 
+// Convert integer to string
 std::string IntToStr(double i) {
 	std::ostringstream out;
 	out << i;
 	return out.str();
 }
 
+// Drive the robot using the okapi controller and arcade control
+// Not in use right now for some reason
 void processDrive(double straight, double strafe, double turn) {
 	// Absolute dead zones
 	if(abs(straight) <= 0.05)
@@ -62,17 +52,19 @@ void processDrive(double straight, double strafe, double turn) {
 }
 
 void myOPControl() {
+	// Run display controller. Not working right now so its commented
 	// if(display.getMode() == SELECTOR)
 	// 	display.startMatchMode();
 	// else
 	// 	display.startMatchMode();
 
+	// Set up state machines and remove update task from autonomous
 	update.remove();
 	intake.fullReset();
 	rollers.fullReset();
 
 	// Acceleration curving
-	double lSpeed =0;
+	double lSpeed = 0;
 	double rSpeed = 0;
 	double tSpeed = 0;
 	double reqRSpeed = 0;
@@ -87,12 +79,12 @@ void myOPControl() {
 
 	double shotTime = 0;
 
+	// Main loop
 	while (1) {
 	intake.update();
 	rollers.update();
 
 	// INTAKE
-	// OUTTAKE
 	if(master.getDigital(ControllerDigital::R1)) {
 		if (rollers.getState() != Rollers::IN_STATE) {
 			rollers.intake();
@@ -116,7 +108,7 @@ void myOPControl() {
 		intake.stop();
 	}
 
-	// EJECTING
+	// EJECTING (Clean shot)
 	if(master.getDigital(ControllerDigital::L2)) {
 		if (rollers.getState() != Rollers::EJECT_STATE)
 			rollers.eject();
@@ -146,6 +138,8 @@ void myOPControl() {
 		intake.stop();
 	}
 
+	// The following few if/else statements were used to test tracking and motion algorithms
+	// They don't have any actual application in operator control during matches/skills
 	bool strafing = false;
 	if(master.getDigital(ControllerDigital::up)) {
 		// strafe(Vector2(1, 1), 0);
@@ -169,11 +163,12 @@ void myOPControl() {
 		pros::delay(500);
 	}
 
-	// Acceleration curve
+	// Joystick curve
 	reqLSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftY));
 	reqRSpeed = joystickSlew(master.getAnalog(ControllerAnalog::leftX));
 	reqTSpeed = joystickSlew(master.getAnalog(ControllerAnalog::rightX));
 
+	// Make sure drive isn't suspended by macros before driving
 	if(!suspendDrive && !strafing)
 		xDrive->xArcade(reqRSpeed, reqLSpeed, reqTSpeed);
 
@@ -182,5 +177,8 @@ void myOPControl() {
 }
 
 double joystickSlew(double input) {
+	// Cube input for more natural control
+	// Low end of the range becomes less sensitive, allowing more precise movements
+	// High end still allows full speed
 	return pow(input, 3);
 }

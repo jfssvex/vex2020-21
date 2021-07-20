@@ -12,6 +12,7 @@
 #include "globals.h"
 #include <string>
 
+// Constants
 const int button_h = 60;
 const int button_w = 200;
 const int maxMessages = 7;
@@ -20,12 +21,13 @@ bool DisplayController::initialized = false;
 auton_route selectedRoute = AUTO_DEPLOY;
 
 // C suffix temporary until autonSelector.cpp removed
-lv_color_t redC = LV_COLOR_MAKE(234, 35, 58);
-lv_color_t blueC = LV_COLOR_MAKE(41, 130, 198);
-lv_color_t purpleC = LV_COLOR_MAKE(88, 36, 133);
+lv_color_t red = LV_COLOR_MAKE(234, 35, 58);
+lv_color_t blue = LV_COLOR_MAKE(41, 130, 198);
+lv_color_t purple = LV_COLOR_MAKE(88, 36, 133);
 lv_color_t grey = LV_COLOR_MAKE(69, 69, 69);
 lv_color_t yellow = LV_COLOR_MAKE(255, 210, 72);
 
+// Lists for debug menu
 std::vector<lv_obj_t *> logMessages;
 std::vector<lv_obj_t *> fixedMessages;
 std::vector<fixed_debug_info> fixedMessageData;
@@ -51,6 +53,7 @@ static lv_obj_t *scr;
 // List object for messages
 lv_obj_t *messsageList;
 
+// Callback function for when an auto routine selected. Updates autoID and changes screen
 static lv_res_t autonSelected(lv_obj_t *btn) {
     int autoID = lv_obj_get_free_num(btn);
     setAuton(autoID);
@@ -69,6 +72,7 @@ auton_route getAuton() {
     return selectedRoute;
 }
 
+// Task to update the labels on fixed messages. Low priority.
 void updateFixedMessages(void *param) {
     while(true) {
         for(int i = 0; i < fixedMessages.size(); i++) {
@@ -78,7 +82,7 @@ void updateFixedMessages(void *param) {
     }
 }
 
-// Might cause errors with pointers !!!!!
+// Might cause errors with pointers !!!!! I don't think it did tho
 lv_theme_t* DisplayController::initTheme(int hue, lv_color_t borderColour, lv_color_t mainColour, int borderWidth) {
     lv_theme_t* theme;
     theme = lv_theme_alien_init(hue, NULL);
@@ -96,12 +100,15 @@ display_mode DisplayController::getMode() {
 }
 
 void DisplayController::logMessage(std::string message, logging_level priority) {
+    // Only allow logging if its an error if the controller is in display mode
     if(this->mode != DEBUG && priority != ERROR) {
         return;
     }
 
+    // Create the new message object
     lv_obj_t * newMessage = lv_list_add(messsageList, NULL, message.c_str(), nullButtonCallback);
 
+    // Customise message according to logging level
     lv_style_t messageStyle;
     switch(priority) {
         case(LOG):
@@ -125,6 +132,7 @@ void DisplayController::logMessage(std::string message, logging_level priority) 
 }
 
 void DisplayController::addFixedMessage(std::string format, char type, void *callback) {
+    // Don't remember how this function was supposed to work
     fixed_debug_info info(format, callback, type);
     fixedMessageData.push_back(info);
 }
@@ -136,6 +144,7 @@ void DisplayController::clearLogs() {
 }
 
 DisplayController::DisplayController() {
+    // Make sure this object is a singleton. Don't want conflicting controllers
     if(initialized) {
         return;
     }
@@ -143,8 +152,8 @@ DisplayController::DisplayController() {
 
     // Set up styles
     lv_style_copy(&redStyle, &lv_style_plain_color);
-    redStyle.body.main_color = redC;
-    redStyle.body.grad_color = redC;
+    redStyle.body.main_color = red;
+    redStyle.body.grad_color = red;
     redStyle.body.radius = 4;
     redStyle.body.border.width = 2;
     redStyle.body.border.color = LV_COLOR_WHITE;
@@ -152,7 +161,7 @@ DisplayController::DisplayController() {
     redStyle.body.padding.hor = 5;
     redStyle.body.padding.inner = 0;
     redStyle.body.shadow.width = 0;
-    redStyle.body.shadow.color = redC;
+    redStyle.body.shadow.color = red;
     redStyle.text.color = LV_COLOR_WHITE;
     //	redPreChosen.text.font = &GOTHAM_20;
 
@@ -171,35 +180,39 @@ DisplayController::DisplayController() {
     mBoxStyle.text.color = LV_COLOR_BLACK;
 
     lv_style_copy(&blueStyle, &redStyle);
-    blueStyle.body.main_color = blueC;
-    blueStyle.body.grad_color = blueC;
+    blueStyle.body.main_color = blue;
+    blueStyle.body.grad_color = blue;
 
     lv_style_copy(&neutralStyle, &blueStyle);
-    neutralStyle.body.main_color = purpleC;
-    neutralStyle.body.grad_color = purpleC;
+    neutralStyle.body.main_color = purple;
+    neutralStyle.body.grad_color = purple;
 
-    colouredBackground = initTheme(10, purpleC, purpleC, 0);
+    colouredBackground = initTheme(10, purple, purple, 0);
 }
 
 lv_obj_t* DisplayController::renderLabel(std::string text, int x, int y, lv_obj_t * host) {
-    lv_obj_t *label = lv_label_create(host, NULL);
-    lv_obj_align(label, host, LV_ALIGN_CENTER, x, y);
-    lv_label_set_text(label, text.c_str());
+    lv_obj_t *label = lv_label_create(host, NULL);      // Create an LVGl label
+    lv_obj_align(label, host, LV_ALIGN_CENTER, x, y);   // Align it to the position
+    lv_label_set_text(label, text.c_str());             // Set the label text
 
     return label;
 }
 
 lv_obj_t *DisplayController::renderButton(int id, int x, int y, int h, int w, std::string labelText, lv_action_t action, lv_style_t *relStyle, lv_obj_t *host) {
+    // Create the LVGL button parented to the host
     lv_cont_set_fit(host, false, false);
     lv_obj_t *button = lv_btn_create(host, NULL);
 
+    // Position appropriately
     lv_obj_set_pos(button, x, y);
     lv_obj_set_size(button, w, h);
 
+    // Set ID and style
     lv_obj_set_free_num(button, id);
     lv_btn_set_style(button, LV_BTN_STYLE_REL, relStyle);
     lv_btn_set_action(button, LV_BTN_ACTION_CLICK, action);
 
+    // Set the label and return the object
     lv_obj_t *buttonLabel = renderLabel(labelText, 0, 0, button);
     lv_obj_align(buttonLabel, button, LV_ALIGN_CENTER, 0, 0);
 
@@ -207,12 +220,14 @@ lv_obj_t *DisplayController::renderButton(int id, int x, int y, int h, int w, st
 }
 
 void DisplayController::startSelectorMode() {
-    this->mode = SELECTOR;
+    this->mode = SELECTOR; // Update state
+    // Set themes and load page
     lv_theme_set_current(colouredBackground);
     scr = lv_page_create(NULL, NULL);
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 
+    // Draw a button for each routine
     renderButton(AUTO_RED_1, LV_HOR_RES / 2, 0, button_h, button_w, "Protected zone \n(5-point)", autonSelected, &redStyle, scr);
     renderButton(AUTO_BLUE_1, 0, LV_VER_RES - 80, button_h, button_w, "Unprotected Zone\n(5-point)", autonSelected, &blueStyle, scr);
     renderButton(AUTO_BLUE_2, LV_HOR_RES/2, LV_VER_RES - 80, button_h, button_w, "Protected Zone\n(5-point)", autonSelected, &blueStyle, scr);
@@ -221,14 +236,15 @@ void DisplayController::startSelectorMode() {
     renderButton(AUTO_RED_2, 0, 20, button_h, button_w, "Unprotected Zone \n(5-point)", autonSelected, &redStyle, scr);
 }
 
-// Only called after autonomous is selected
 void DisplayController::showAutonSelected() {
     this->mode = SELECTOR;
+    // Clear selector screen and create a new one
     lv_obj_clean(scr);
     scr = lv_page_create(NULL, NULL);
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 
+    // Draw a button based on the auto that was selected
     auton_route autoID = getAuton();
     std::string autoName;
     switch(autoID) {
@@ -257,6 +273,8 @@ void DisplayController::showAutonSelected() {
     renderButton(-1, 80, 50, 150, 300, autoName, nullButtonCallback, &neutralStyle, scr);
 }
 
+// pcfs functions are used to open and display the binary image on the SD card
+// for the match mode. I don't understand exactly how they work.
 typedef FILE *pc_file_t;
 
 static lv_fs_res_t pcfs_open(void *file_p, const char *fn, lv_fs_mode_t mode)
@@ -314,8 +332,8 @@ static lv_fs_res_t pcfs_tell(void *file_p, uint32_t *pos_p)
     return LV_FS_RES_OK;
 }
 
-// Called after auton selector
 void DisplayController::startMatchMode() {
+    // Set up state and clear screen if there was something on it (selector is the only other thing that could have run)
     if(this->mode == SELECTOR) {
         lv_obj_clean(scr);
     }
@@ -324,6 +342,7 @@ void DisplayController::startMatchMode() {
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 
+    // Use pcfs functions to read in the binary image and display it in LVGL
     lv_fs_drv_t pcfs_drv;
     memset(&pcfs_drv, 0, sizeof(lv_fs_drv_t));
 
@@ -345,22 +364,25 @@ void DisplayController::startMatchMode() {
     lv_obj_set_width(messsageList, LV_HOR_RES - 40);
 }
 
-// First and only mode to be run
 void DisplayController::startDebugMode() {
+    // Set state and create LVGL screen
     this->mode = DEBUG;
     lv_theme_set_current(colouredBackground);
     scr = lv_page_create(NULL, NULL);
     lv_scr_load(scr);
     lv_page_set_sb_mode(scr, LV_SB_MODE_OFF);
 
+    // Initialize list of logging messages
     messsageList = lv_list_create(lv_scr_act(), NULL);
     lv_obj_set_width(messsageList, LV_HOR_RES - 40);
 
+    // Create blocks for every fixed message that was inserted
     for(int i = 0; i < fixedMessageData.size(); i++) {
         fixedMessages.push_back(lv_list_add(messsageList, NULL, fixedMessageData[i].getLabel().c_str(), nullButtonCallback));
         this->logMessage(std::to_string(lv_obj_count_children(fixedMessages[i])), ERROR);
         lv_obj_set_style(fixedMessages[i], &logStyle);
     }
 
+    // Start the task to update fixed messages
     pros::Task udpateMessages(updateFixedMessages, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Updating Messages");
 }
