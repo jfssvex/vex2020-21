@@ -1,3 +1,9 @@
+/**
+ * @file src/systems/toggle.cpp
+ * 
+ * Contains Toggle class function definitions
+ */
+
 #include "toggle.h"
 
 Toggle::Toggle(std::vector<okapi::ControllerDigital> _buttons, okapi::Controller _controller, bool defaultState) {

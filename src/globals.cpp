@@ -1,3 +1,9 @@
+/**
+ * @file src/globals.cpp
+ * 
+ * Contains definitions for all global extern variables
+ */
+
 #include "globals.h"
 #include "chassis.h"
 

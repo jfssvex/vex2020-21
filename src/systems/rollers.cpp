@@ -1,3 +1,9 @@
+/**
+ * @file src/systems/rollers.cpp
+ * 
+ * Contains Rollers state machine definitions for Change Up
+ */
+
 #include "rollers.h"
 #include "main.h"
 

@@ -1,3 +1,11 @@
+/**
+ * @file src/macros.cpp
+ * 
+ * Contains definitions for macro functions to automate
+ * tasks on the field for use in driver or autonomous
+ * control periods.
+ */
+
 #include "macros.h"
 #include "globals.h"
 #include "main.h"

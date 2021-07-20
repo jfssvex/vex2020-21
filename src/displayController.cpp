@@ -1,3 +1,13 @@
+/**
+ * @file src/displayController.cpp
+ * 
+ * Contains logic for the display controller to manage the V5
+ * LCD screen with autonomous selector, logger, and logo display
+ * during match.
+ * 
+ * Logger still has some bugs.
+ */
+
 #include "displayController.h"
 #include "globals.h"
 #include <string>

@@ -1,4 +1,19 @@
-#include "motorTemp.h"
+/**
+ * @file src/main.cpp
+ * 
+ * The PROS entry point. When a program is run the functions in
+ * this file are called in the following orders:
+ * 
+ * When connected to competition switch:
+ * initialize() -> competition_initialize() -> autonomous() -> opcontrol() -> disabled()
+ * 
+ * When testing with "drive" feature:
+ * initialize() -> opcontrol()
+ * 
+ * When running autonomous without competition switch:
+ * initialize() -> autonomous() -> disabled()
+ */
+
 #include "main.h"
 #include "tracking.h"
 #include "globals.h" 
@@ -22,7 +37,7 @@ void initialize() {
 	pros::lcd::initialize();
 	// Set default auto routine (for testing purposes)
 	setAuton(AUTO_DEPLOY);
-	display.addFixedMessage("Bruh: ", 'i', getIntakeX());
+	display.addFixedMessage("Bruh: ", 'i', getIntakeX()); // This doesn't work and idk why. Some bug in the DisplayController
 	// display.startSelectorMode();
 }
 

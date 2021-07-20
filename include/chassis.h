@@ -1,3 +1,9 @@
+/**
+ * @file include/chassis.h
+ * 
+ * Information about the robot chassis including port numbers and dimensions
+ */
+
 #pragma once
 #include "main.h"
 #include "vector"
@@ -28,9 +34,6 @@
 #define BOTROLLER 6
 #define TOPROLLER 7
 
-#define TRAY 8
-#define LIFT 9
-
 // Physical motor port connections -- Misc. Motors
 #define LINTAKE_PORT 11
 #define RINTAKE_PORT 12
@@ -46,18 +49,75 @@
 #define BACK_TRACK_TOP 'C'
 #define BACK_TRACK_BOT 'D'
 
+// Constants for motor speeds and encoder positions
 #define AUTO_SPEED 80
 #define INTAKE_SPEED 120
 #define LIFT_LIMIT 2900
 #define LIFT_SPEED 107
 
+/**
+ * @brief Curve joystick input to make driving more manageable.
+ * 
+ * @param input raw joystick input
+ * @return double - curved joystick input
+ */
 double joystickSlew(double input);
+
+/**
+ * @brief Task to track motor temperatures and notify upon overheat.
+ * 
+ * @param param empty task parameter
+ */
+void motorTemp(void *param);
+
+// -------------------------------------- The following functions are deprecated -------------------------------------- //
+
+/**
+ * @brief Get encoder readings from the allMotors array (deprecated)
+ * 
+ * @param ports a list of allMotors indices to read from
+ * @return std::vector<double> - a list of the readings (same order as ports param)
+ */
 std::vector<double> getEncoders(std::vector<int> ports);
-void auton();
+
+/**
+ * @brief Reset all motor encoders (deprecated)
+ */
 void resetChassis();
+
+/**
+ * @brief Move the intake motors (deprecated)
+ * 
+ * @param cond which direction to move in (1 = intake, 0 = stop)
+ */
 void moveIntake(int cond);
+
+/**
+ * @brief Move motors from the allMotors array (deprecated)
+ * 
+ * @param ports a list of allMotors indices to move
+ * @param speed the power to apply (127-scale)
+ */
 void move(std::vector<int> ports, float speed);
-void motorTemp(void* param);
+
+/**
+ * @brief Move motors from the allMotors array to a certain encoder value (deprecated)
+ * 
+ * @param ports a list of allMotors indices to move
+ * @param distance the target encoder value
+ */
 void moveAbsolute(std::vector<int> ports, float distance);
+
+/**
+ * @brief Set a motor's brake mode to hold
+ * 
+ * @param motor an allMotors index
+ */
 void hold(int motor);
+
+/**
+ * @brief Set a motor's brake mode to coast
+ * 
+ * @param motor an allMotors index
+ */
 void release(int motor);

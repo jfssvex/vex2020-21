@@ -1,3 +1,10 @@
+/**
+ * @file src/systems/systemManager.cpp
+ * 
+ * Contains SystemManager class definitions including virtual function
+ * default definitions.
+ */
+
 #include "main.h"
 #include "systemManager.h"
 
@@ -21,7 +28,6 @@ double SystemManager::getPower() {
 double SystemManager::getTarget() {
     return this->target;
 }
-
 void SystemManager::reset() {
     this->changeState(RESET_STATE);
 }
@@ -34,7 +40,6 @@ void SystemManager::disable() {
 void SystemManager::revertState() {
     this->changeState(lastState);
 }
-
 uint8_t SystemManager::getState() {
 	return this->state;
 }

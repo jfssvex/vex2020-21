@@ -1,3 +1,11 @@
+/**
+ * @file src/control.cpp
+ * 
+ * Contains definitions of motion control functions for controlling
+ * the chassis. Currently designed for X-Drive control for the Change
+ * Up seasons specifically.
+ */
+
 #include "tracking.h"
 #include "chassis.h"
 #include "globals.h"
@@ -41,37 +49,37 @@ float getDistance(float tx, float ty, float sx, float sy) {
 	return sqrt((xDiff*xDiff) + (yDiff*yDiff));
 }
 
-// This doesn't work right now, didn't have time to figure out why
-// void stepMotor(pros::Motor motor, float targetSpeed) {
-// 	float targetRPM = motor.get_target_velocity();
-// 	auto gearset = motor.get_gearing();
-// 	float RPMscale;
+/* This doesn't work right now, didn't have time to figure out why
+void stepMotor(pros::Motor motor, float targetSpeed) {
+	float targetRPM = motor.get_target_velocity();
+	auto gearset = motor.get_gearing();
+	float RPMscale;
 
-// 	switch(gearset) {
-// 		case(pros::E_MOTOR_GEARSET_36): // red cartridge (torque)
-// 			RPMscale = 100;
-// 			break;
-// 		case(pros::E_MOTOR_GEARSET_18): // green cartridge (high speed)
-// 			RPMscale = 200;
-// 			break;
-// 		case(pros::E_MOTOR_GEARSET_06): // blue cartridge (turbo)
-// 			RPMscale = 600;
-// 			break;
-// 	}
+	switch(gearset) {
+		case(pros::E_MOTOR_GEARSET_36): // red cartridge (torque)
+			RPMscale = 100;
+			break;
+		case(pros::E_MOTOR_GEARSET_18): // green cartridge (high speed)
+			RPMscale = 200;
+			break;
+		case(pros::E_MOTOR_GEARSET_06): // blue cartridge (turbo)
+			RPMscale = 600;
+			break;
+	}
 
-// 	// Convert to the 127-scale
-// 	float pastTarget = (targetRPM / RPMscale) * 127;
+	// Convert to the 127-scale
+	float pastTarget = (targetRPM / RPMscale) * 127;
 
-// 	// Cap acceleration and drive
-// 	float delta = targetSpeed - pastTarget;
-// 	if(abs(delta) > MAX_ACCELERATION) {
-// 		delta = (delta/abs(delta)) * MAX_ACCELERATION;
-// 	}
-// 	motor.move(delta);
-// }
+	// Cap acceleration and drive
+	float delta = targetSpeed - pastTarget;
+	if(abs(delta) > MAX_ACCELERATION) {
+		delta = (delta/abs(delta)) * MAX_ACCELERATION;
+	}
+	motor.move(delta);
+} */
 
 void strafe(Vector2 dir, double turn) {
-	dir = toLocalCoordinates(dir);
+	dir = toLocalOrientation(dir);
 	double xVel = dir.getX();
 	double yVel = dir.getY();
 

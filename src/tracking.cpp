@@ -1,3 +1,12 @@
+/**
+ * @file src/tracking.cpp
+ * 
+ * Contains tracking task used to locate the robot on the field using
+ * tracking wheel encoder readings. Also contains definitions for helper
+ * classes and math utilities to handle vector transformations.
+ * Algorithm from http://thepilons.ca/wp-content/uploads/2018/10/Tracking.pdf
+ */
+
 #include "tracking.h"
 #include "chassis.h"
 #include "globals.h"
@@ -123,13 +132,13 @@ void tracking(void* param) {
 
 // ----------------- Math utilities ----------------- //
 
-Vector2 toLocalCoordinates(Vector2 vec) {
+Vector2 toLocalOrientation(Vector2 vec) {
 	double localAngle = -trackingData.getHeading();
 
 	return rotateVector(vec, localAngle);
 }
 
-Vector2 toGlobalCoordinates(Vector2 vec) {
+Vector2 toGlobalOrientation(Vector2 vec) {
 	double localAngle = trackingData.getHeading();
 
 	return rotateVector(vec, localAngle);
@@ -170,7 +179,7 @@ Vector2 TrackingData::getPos() {
 	return pos;
 }
 Vector2 TrackingData::getForward() {
-	return toGlobalCoordinates(Vector2(0, 1));
+	return toGlobalOrientation(Vector2(0, 1));
 }
 
 void TrackingData::update(double _x, double _y, double _h) {

@@ -1,6 +1,19 @@
+/**
+ * @file src/chassis.cpp
+ * 
+ * This file was created in the Tower Takeover season as a way to manage
+ * all 8 motors from a central location in the codebase is not used
+ * because state machines offer a better solution.
+ * 
+ * This file was kept in just in case but should probably not be brought
+ * forwards. The only function that has real application is the motorTemp
+ * task to detect overheating.
+ */
+
 #include "chassis.h"
 #include <vector>
 
+// A list of all the motors in the system
 pros::Motor allMotors[] = {
     pros::Motor(FR_PORT, pros::E_MOTOR_GEARSET_18),
     pros::Motor(BR_PORT, pros::E_MOTOR_GEARSET_18),

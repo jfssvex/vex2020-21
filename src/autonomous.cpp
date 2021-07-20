@@ -17,20 +17,22 @@
  */
 
 using namespace pros;
-using namespace okapi;
 extern int auton_id;
 
-void updateSysMan(void *param)
-{
-    while (1)
-    {
+/**
+ * @brief Task that runs update functions for state machines
+ * 
+ * @param param Task parameter, nothing passed in
+ */
+void updateSysMan(void *param) {
+    while (1) {
         intake.update();
         rollers.update();
-        pros::delay(5);
+        pros::delay(20);
     }
 }
 
-// Goals
+// Goal positions. Measured separately for consistency
 Vector2 goalBL(17.5, 4);
 Vector2 goalCL(5, 65);
 Vector2 goalTL(17, 125);
@@ -43,8 +45,11 @@ Vector2 goalBC(69, 12);
 void fullAuto();
 void homeRowAuto();
 
-void myAutonomous()
-{
+/**
+ * @brief Main autonomous function. Runs during auto skills and match auto after init
+ */
+void myAutonomous() {
+    // Initializing state machines and setting up update
     update = pros::Task(updateSysMan, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Update system manager");
     rollers.fullReset();
     intake.fullReset();
@@ -135,8 +140,11 @@ void myAutonomous()
     update.remove();
 }
 
-void fullAuto()
-{
+/**
+ * @brief An autonomous routine meant to score in all goals for
+ * Change Up autonomous skills
+ */
+void fullAuto() {
     flipout();
 
     // Flipout
@@ -246,8 +254,11 @@ void fullAuto()
     shootStaggeredIntake(3);
 }
 
-void homeRowAuto()
-{
+/**
+ * @brief Auto routine that scores along the home row for Change Up,
+ * match auto or skills
+ */
+void homeRowAuto() {
     flipout();
 
     // Flipout

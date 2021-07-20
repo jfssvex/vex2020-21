@@ -1,3 +1,10 @@
+/**
+ * @file src/opcontrol.cpp
+ * 
+ * Contains main operator control loop called from src/main.cpp.
+ * Also has some helper functions to handle drive input.
+ */
+
 #include "main.h"
 #include "tracking.h"
 #include "globals.h"
@@ -36,8 +43,7 @@ extern float x;
 extern float y;
 extern float theta;
 
-std::string IntToStr(double i)
-{
+std::string IntToStr(double i) {
 	std::ostringstream out;
 	out << i;
 	return out.str();
