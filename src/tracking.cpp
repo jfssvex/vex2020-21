@@ -252,6 +252,7 @@ double Vector2::getAngle() {
 }
 
 Vector2 Vector2::normalize() {
+	// v̂ = v / ||v||
 	double divisor = this->getMagnitude();
 	double nx = x/divisor;
 	double ny = y/divisor;
